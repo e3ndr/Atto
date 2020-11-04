@@ -60,7 +60,7 @@ public class Editor implements Screen, KeyListener {
 
             this.status = String.format("Saved file : %s", this.file.getCanonicalPath());
             this.mode = EditorMode.EDITING;
-            
+
             this.draw();
 
             ThreadHelper.executeLater(() -> {
@@ -176,7 +176,7 @@ public class Editor implements Screen, KeyListener {
     public void onKey(int key) {
         if (this.mode == EditorMode.EDITING) {
             switch (key) {
-            
+
                 case 15: // ^O
                     this.mode = EditorMode.OPEN_QUERY;
                     this.buffer = new StringBuilder();
@@ -290,6 +290,9 @@ public class Editor implements Screen, KeyListener {
                 if (this.mode == EditorMode.EDITING) {
                     if (this.cursor.x > 0) {
                         this.move(-1, 0);
+                    } else if (this.cursor.y > 0) {
+                        this.cursor.x = this.map.getLength(this.cursor.y - 1);
+                        this.move(0, -1);
                     } else {
                         ConsoleUtil.bell();
                     }
@@ -360,32 +363,31 @@ public class Editor implements Screen, KeyListener {
             }
 
             case TAB: {
-            	this.onKey(' ');
-            	this.onKey(' ');
-            	this.onKey(' ');
-            	this.onKey(' ');
-            	
-            	return;
+                this.onKey(' ');
+                this.onKey(' ');
+                this.onKey(' ');
+                this.onKey(' ');
+
+                return;
             }
-            
+
             case DELETE: {
                 this.map.set(this.cursor.x, this.cursor.y, ' ');
                 this.edited = true;
                 this.move(-1, 0);
-                
+
                 return;
             }
-            
+
             case HOME: {
-            	this.cursor.x = 0;
-            	this.cursor.y = 0;
-            	this.scroll.x = 0;
-            	this.scroll.y = 0;
-            	this.draw();
-            	return;
+                this.cursor.x = 0;
+                this.cursor.y = 0;
+                this.scroll.x = 0;
+                this.scroll.y = 0;
+                this.draw();
+                return;
             }
-            	
-            	
+
             case ALT:
             case END:
             default:
