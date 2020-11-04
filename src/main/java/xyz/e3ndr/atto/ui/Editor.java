@@ -59,7 +59,8 @@ public class Editor implements Screen, KeyListener {
             Files.write(this.file.toPath(), contents.getBytes());
 
             this.status = String.format("Saved file : %s", this.file.getCanonicalPath());
-
+            this.mode = EditorMode.EDITING;
+            
             this.draw();
 
             ThreadHelper.executeLater(() -> {
@@ -71,9 +72,6 @@ public class Editor implements Screen, KeyListener {
                     e.printStackTrace();
                 }
             }, 2000);
-
-            this.mode = EditorMode.EDITING;
-            this.draw();
         }
     }
 
@@ -100,7 +98,7 @@ public class Editor implements Screen, KeyListener {
 
             this.status = this.file.getCanonicalPath();
         } else {
-            this.status = "<New File>";
+            this.status = "(New File)";
         }
 
         this.mode = EditorMode.EDITING;
@@ -178,6 +176,7 @@ public class Editor implements Screen, KeyListener {
     public void onKey(int key) {
         if (this.mode == EditorMode.EDITING) {
             switch (key) {
+            
                 case 15: // ^O
                     this.mode = EditorMode.OPEN_QUERY;
                     this.buffer = new StringBuilder();
@@ -360,11 +359,35 @@ public class Editor implements Screen, KeyListener {
                 return;
             }
 
+            case TAB: {
+            	this.onKey(' ');
+            	this.onKey(' ');
+            	this.onKey(' ');
+            	this.onKey(' ');
+            	
+            	return;
+            }
+            
+            case DELETE: {
+                this.map.set(this.cursor.x, this.cursor.y, ' ');
+                this.edited = true;
+                this.move(-1, 0);
+                
+                return;
+            }
+            
+            case HOME: {
+            	this.cursor.x = 0;
+            	this.cursor.y = 0;
+            	this.scroll.x = 0;
+            	this.scroll.y = 0;
+            	this.draw();
+            	return;
+            }
+            	
+            	
             case ALT:
-            case DELETE:
             case END:
-            case HOME:
-            case TAB:
             default:
                 return;
 

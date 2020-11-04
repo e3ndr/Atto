@@ -39,7 +39,7 @@ public class Launcher implements Runnable {
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(Long.MAX_VALUE); // Keep a thread awake, since ConsoleUtil's key listener is a daemon thread.
+                    Thread.sleep(Integer.MAX_VALUE); // Keep a thread awake, since ConsoleUtil's key listener is a daemon thread.
                 } catch (InterruptedException e) {}
             }
         }).start();

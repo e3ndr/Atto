@@ -101,7 +101,7 @@
 		<dependency>
 			<groupId>com.github.e3ndr</groupId>
 			<artifactId>ConsoleUtil</artifactId>
-			<version>bb72c92</version>
+			<version>f33e2a8</version>
 			<scope>compile</scope>
 		</dependency>
 	</dependencies>
