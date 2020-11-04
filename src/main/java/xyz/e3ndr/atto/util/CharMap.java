@@ -11,18 +11,18 @@ public class CharMap {
         }
 
         if (this.map[y] == null) {
-            this.map[y] = new char[x + 1];
+            this.map[y] = new char[x];
 
             Arrays.fill(this.map[y], ' ');
-        } else if (this.map[y].length < (x + 1)) {
-            char[] newX = new char[x + 1];
+        } else if (this.map[y].length < x) {
+            char[] newX = new char[x];
             char[] oldX = this.map[y];
 
             for (int i = 0; i != x; i++) {
-                if (i >= oldX.length) {
-                    newX[i] = ' ';
-                } else {
+                if (i < oldX.length) {
                     newX[i] = oldX[i];
+                } else {
+                    newX[i] = ' ';
                 }
             }
 
@@ -75,6 +75,10 @@ public class CharMap {
         for (int y = top; y != height + top; y++) {
             StringBuilder line = new StringBuilder();
 
+            if (!fileOut) {
+                line.append('\r');
+            }
+
             if (y < this.map.length) {
                 char[] lineArr = this.map[y];
 
@@ -95,7 +99,7 @@ public class CharMap {
                 }
             }
 
-            lines[num] = line.toString();
+            lines[num] = fileOut ? line.toString().replaceFirst("\\s++$", "") : line.toString();
 
             num++;
         }
