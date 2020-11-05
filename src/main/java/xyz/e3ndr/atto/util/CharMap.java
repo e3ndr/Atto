@@ -75,10 +75,6 @@ public class CharMap {
         for (int y = top; y != height + top; y++) {
             StringBuilder line = new StringBuilder();
 
-            if (!fileOut) {
-                line.append('\r');
-            }
-
             if (y < this.map.length) {
                 char[] lineArr = this.map[y];
 

@@ -54,8 +54,6 @@ public class Editor implements Screen, KeyListener {
 
             String contents = String.join(System.lineSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
 
-            contents = contents.substring(0, contents.length() - 1); // Strip a newline char.
-
             Files.write(this.file.toPath(), contents.getBytes());
 
             this.status = String.format("Saved file : %s", this.file.getCanonicalPath());
