@@ -6,9 +6,11 @@ import java.io.IOException;
 import org.jetbrains.annotations.Nullable;
 
 import lombok.Getter;
+import lombok.NonNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 
 @Getter
@@ -21,6 +23,12 @@ public class Launcher implements Runnable {
     }, description = "Opens the specified file")
     private @Nullable File file;
 
+    @Option(names = {
+            "-l",
+            "--lang"
+    }, description = "Uses a specified language")
+    private @NonNull String lang = "en";
+
     public static void main(String[] args) throws IOException, InterruptedException {
         ConsoleUtil.summonConsoleWindow();
         new CommandLine(new Launcher()).execute(args);
@@ -29,6 +37,8 @@ public class Launcher implements Runnable {
     @Override
     public void run() {
         try {
+            LangProvider.setLanguage(this.lang);
+
             new Atto(this);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
