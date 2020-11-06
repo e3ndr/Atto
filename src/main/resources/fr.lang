@@ -1,0 +1,13 @@
+dialog.save=Emplacement du fichier: %s
+dialog.open=Fichier à ouvrir: %s 
+
+editor.unsaved=ÉDITÉ
+editor.inserting=INS
+
+status.savedfile=Fichier enregistré dans «%s»
+status.readingfile=Lecture de fichier «%s»
+status.newfile=(Nouveau Fichier)
+
+hint.bottom=^S Enregistrer le fichier    ^O Fichier ouvert    ^L Effacer la ligne de texte
+
+misc.listseperator=, 

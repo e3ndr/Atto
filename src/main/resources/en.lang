@@ -1,0 +1,13 @@
+dialog.save=File location: %s
+dialog.open=File to open: %s 
+
+editor.unsaved=UNSAVED
+editor.inserting=INS
+
+status.savedfile=Saved File "%s"
+status.readingfile=Reading File "%s"
+status.newfile=(New File)
+
+hint.bottom=^S Save File    ^O Open File    ^L Clear Line
+
+misc.listseperator=, 
