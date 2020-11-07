@@ -1,0 +1,13 @@
+dialog.save=Ubicación: %s
+dialog.open=Abrir este archivo: %s 
+
+editor.unsaved=SIN GUARDAR
+editor.inserting=INS
+
+status.savedfile=Archivo Guardado : %s
+status.readingfile=Leyendo Archivo : %s
+status.newfile=(Nuevo Archivo)
+
+hint.bottom=^S Guardar Archivo    ^O Abrir Archivo    ^L Borrar Linea
+
+misc.listseperator=,
