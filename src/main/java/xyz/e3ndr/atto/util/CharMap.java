@@ -37,7 +37,7 @@ public class CharMap {
     }
 
     public void set(int x, int y, char c) {
-        this.ensureCapacity(x, y);
+        this.ensureCapacity(x + 1, y);
 
         this.map[y][x] = c;
     }

@@ -22,16 +22,17 @@ public class LangProvider {
 
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
-                int c = 0;
+                int c;
+
                 while ((c = reader.read()) != -1) {
                     sb.append((char) c);
                 }
             }
 
-            String[] lines = sb.toString().split("\n");
+            String[] lines = sb.toString().replace('\r', '\n').split("\n");
 
             for (String line : lines) {
-                if (line.contains("=")) {
+                if (line.contains("=") && !line.startsWith("#")) {
                     String[] split = line.split("=", 2);
 
                     lang.put(split[0].toLowerCase(), split[1]);

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.ThreadHelper;
@@ -23,19 +24,21 @@ import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
 
 public class EditorScreen implements Screen, KeyListener {
-    private @NonNull Location cursor = new Location(0, 0);
-    private @NonNull Location scroll = new Location(0, 0);
+    private Location cursor = new Location(0, 0);
+    private Location scroll = new Location(0, 0);
 
-    private @NonNull CharMap map = new CharMap();
+    private @NonNull @Getter @Setter LineEndings lineEndings;
     private @Nullable @Getter File file;
+    private CharMap map = new CharMap();
 
-    private @Getter boolean inserting = false;
+    private @Getter boolean overwriting = false;
     private @Getter boolean edited = false;
 
-    private @NonNull Atto atto;
+    private Atto atto;
 
-    public EditorScreen(@NonNull Atto atto) {
+    public EditorScreen(@NonNull Atto atto, @NonNull LineEndings lineEndings) {
         this.atto = atto;
+        this.lineEndings = lineEndings;
 
         KeyHook.addListener(this);
     }
@@ -46,12 +49,13 @@ public class EditorScreen implements Screen, KeyListener {
             this.edited = false;
             this.file = file;
 
-            String contents = String.join(System.lineSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
+            String contents = String.join(this.lineEndings.getSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
 
             Files.write(this.file.toPath(), contents.getBytes());
 
             this.atto.setStatus(String.format(LangProvider.get("status.savedfile"), this.file.getCanonicalPath()));
             this.atto.setMode(EditorMode.EDITING_TEXT);
+            this.atto.draw();
 
             ThreadHelper.executeLater(() -> {
                 try {
@@ -73,9 +77,11 @@ public class EditorScreen implements Screen, KeyListener {
             this.atto.setStatus(String.format(LangProvider.get("status.readingfile"), this.file.getCanonicalPath()));
             this.atto.draw();
 
-            if (this.file.exists()) {
-                String contents = new String(Files.readAllBytes(this.file.toPath())).replace("\r", "").replace("\t", "    ");
-                String[] lines = contents.split("\n");
+            if (this.file.isFile()) {
+                String contents = new String(Files.readAllBytes(this.file.toPath())).replace("\t", "    ");
+                String[] lines = contents.replace("\r", "\n").split("\n");
+
+                this.lineEndings = LineEndings.detect(contents);
 
                 for (int y = 0; y != lines.length; y++) {
                     char[] line = lines[y].toCharArray();
@@ -92,6 +98,7 @@ public class EditorScreen implements Screen, KeyListener {
         }
 
         this.atto.setMode(EditorMode.EDITING_TEXT);
+        this.atto.draw();
     }
 
     @Override
@@ -126,12 +133,13 @@ public class EditorScreen implements Screen, KeyListener {
 
                 case 12: // ^L
                     this.map.clearLine(this.cursor.y);
+                    this.cursor.x = 0;
                     this.atto.draw();
 
                     return;
 
                 default: {
-                    if (this.inserting) {
+                    if (this.overwriting) {
                         this.map.set(this.cursor.x, this.cursor.y, (char) key);
                     } else {
                         this.map.insert(this.cursor.x, this.cursor.y, (char) key);
@@ -181,6 +189,14 @@ public class EditorScreen implements Screen, KeyListener {
     public void onKey(InputKey key) {
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
             switch (key) {
+
+                case END: {
+                    this.lineEndings = this.lineEndings.getNextInList();
+                    this.edited = true;
+                    this.atto.draw();
+
+                    return;
+                }
 
                 case PAGE_UP: {
                     if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
@@ -243,7 +259,7 @@ public class EditorScreen implements Screen, KeyListener {
 
                 // Editing
                 case ENTER: {
-                    if (!this.inserting) {
+                    if (!this.overwriting) {
                         this.cursor.x = this.map.getLength(this.cursor.y + 1);
                     }
 
@@ -254,7 +270,7 @@ public class EditorScreen implements Screen, KeyListener {
 
                 case BACK_SPACE: {
                     if (this.cursor.x > 0) {
-                        if (this.inserting) {
+                        if (this.overwriting) {
                             this.map.set(this.cursor.x - 1, this.cursor.y, ' ');
                         } else {
                             this.map.remove(this.cursor.x - 1, this.cursor.y);
@@ -270,7 +286,7 @@ public class EditorScreen implements Screen, KeyListener {
                 }
 
                 case INSERT: {
-                    this.inserting = !this.inserting;
+                    this.overwriting = !this.overwriting;
                     this.atto.draw();
 
                     return;
@@ -298,12 +314,12 @@ public class EditorScreen implements Screen, KeyListener {
                     this.cursor.y = 0;
                     this.scroll.x = 0;
                     this.scroll.y = 0;
+                    this.atto.draw();
 
                     return;
                 }
 
                 case ALT:
-                case END:
                 default:
                     return;
 

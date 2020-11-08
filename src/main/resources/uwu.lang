@@ -2,6 +2,7 @@ dialog.save=fwile locatey: %s
 dialog.open=fwile to opwen: %s 
 
 editor.unsaved=unsaved
+editor.overwriting=ovr
 editor.inserting=ins
 
 status.savedfile=sabed ze file : %s

@@ -2,6 +2,7 @@ dialog.save=Emplacement du fichier: %s
 dialog.open=Fichier à ouvrir: %s 
 
 editor.unsaved=ÉDITÉ
+editor.overwriting=OVR
 editor.inserting=INS
 
 status.savedfile=Fichier enregistré dans «%s»

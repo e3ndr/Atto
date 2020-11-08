@@ -2,6 +2,7 @@ dialog.save=File location: %s
 dialog.open=File to open: %s 
 
 editor.unsaved=UNSAVED
+editor.overwriting=OVR
 editor.inserting=INS
 
 status.savedfile=Saved File "%s"

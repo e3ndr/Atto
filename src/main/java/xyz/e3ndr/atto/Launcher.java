@@ -2,18 +2,16 @@ package xyz.e3ndr.atto;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import org.jetbrains.annotations.Nullable;
 
-import lombok.Getter;
-import lombok.NonNull;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 
-@Getter
 @Command(name = "atto", mixinStandardHelpOptions = true, version = "Atto-" + Atto.VERSION, description = "Opens Atto")
 public class Launcher implements Runnable {
 
@@ -23,12 +21,6 @@ public class Launcher implements Runnable {
     }, description = "Opens the specified file")
     private @Nullable File file;
 
-    @Option(names = {
-            "-l",
-            "--lang"
-    }, description = "Uses a specified language")
-    private @NonNull String lang = "en";
-
     public static void main(String[] args) throws IOException, InterruptedException {
         ConsoleUtil.summonConsoleWindow();
         new CommandLine(new Launcher()).execute(args);
@@ -37,22 +29,27 @@ public class Launcher implements Runnable {
     @Override
     public void run() {
         try {
-            LangProvider.setLanguage(this.lang);
+            File configFile = new File("config.json");
+            ConfigFile config;
 
-            new Atto(this);
+            if (configFile.exists()) {
+                byte[] bytes = Files.readAllBytes(configFile.toPath());
+                String contents = new String(bytes, StandardCharsets.UTF_8);
+
+                config = Atto.GSON.fromJson(contents, ConfigFile.class);
+            } else {
+                config = new ConfigFile();
+            }
+
+            String contents = Atto.GSON.toJson(config);
+            byte[] bytes = contents.getBytes(StandardCharsets.UTF_8);
+            // Update config file.
+            Files.write(configFile.toPath(), bytes);
+
+            new Atto(this.file, config);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    static {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Thread.sleep(Integer.MAX_VALUE); // Keep a thread awake, since ConsoleUtil's key listener is a daemon thread.
-                } catch (InterruptedException e) {}
-            }
-        }).start();
     }
 
 }

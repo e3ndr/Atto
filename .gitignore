@@ -2,3 +2,5 @@
 target*
 .project
 .classpath
+config.json
+test.txt
