@@ -2,6 +2,6 @@
  A small Java based console text editor.
 
 <p align="center">
-  <img src="https://imgur.com/download/iGsC21q" />
+  <img src="https://i.imgur.com/U3TpTAh.gif" />
 </p>
   
