@@ -25,7 +25,7 @@ import xyz.e3ndr.consoleutil.ConsoleWindow;
 @Getter
 @Setter
 public class Atto {
-    public static final String VERSION = "2.1.0";
+    public static final String VERSION = "2.1.1";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static final int BOTTOM_INDENT = 1;

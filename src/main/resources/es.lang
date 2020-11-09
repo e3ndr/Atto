@@ -9,6 +9,6 @@ status.savedfile=Archivo Guardado: %s
 status.readingfile=Leyendo Archivo: %s
 status.newfile=(Nuevo Archivo)
 
-hint.bottom=^S Guardar Archivo    ^O Abrir Archivo    ^L Borrar Linea
+hint.bottom=^W Salida ^S Guardar Archivo    ^O Abrir Archivo    ^L Borrar Linea
 
 misc.listseperator=, 

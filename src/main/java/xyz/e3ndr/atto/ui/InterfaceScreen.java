@@ -113,22 +113,26 @@ public class InterfaceScreen implements Screen, KeyListener {
         try {
             if (control) {
                 switch (key) {
-                    case 'o': // ^O
+                    case 'o': { // ^O
                         this.atto.getInterfaceScreen().triggerOpenDialog();
                         this.atto.draw();
 
                         return;
+                    }
 
-                    case 's': // ^S
+                    case 's': { // ^S
                         this.atto.getInterfaceScreen().triggerSaveDialog();
                         this.atto.draw();
 
                         return;
-
-                    default: {
-
-                        return;
                     }
+
+                    case 'w': // ^W
+                    	System.exit(0);
+
+                    default:
+                        return;
+
                 }
             } else {
                 if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {

@@ -9,6 +9,6 @@ status.savedfile=sabed ze file : %s
 status.readingfile=weading this fwile -> %s
 status.newfile=(new fwile)
 
-hint.bottom=^S sabe ze fwile    ^O owpen a fwile    ^L deletey the liney
+hint.bottom=^W the big goodbye ^S sabe ze fwile    ^O owpen a fwile    ^L deletey the liney
 
 misc.listseperator=, 
