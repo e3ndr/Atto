@@ -5,10 +5,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
+import org.jetbrains.annotations.Nullable;
+
 import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.ThreadHelper;
+import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
 import xyz.e3ndr.atto.util.Location;
 import xyz.e3ndr.consoleutil.ConsoleColor;
@@ -22,32 +27,35 @@ public class TextEditorScreen implements Screen, KeyListener {
     private Location cursor = new Location(0, 0);
     private Location scroll = new Location(0, 0);
 
+    private @NonNull @Getter @Setter LineEndings lineEndings;
+    private @Nullable @Getter File file;
     private CharMap map = new CharMap();
-    private @Getter File file;
 
+    private @Getter boolean overwriting = false;
     private @Getter boolean edited = false;
-    private @Getter boolean inserting = false;
 
     private Atto atto;
 
-    public TextEditorScreen(Atto atto) {
+    public TextEditorScreen(@NonNull Atto atto, @NonNull LineEndings lineEndings) {
         this.atto = atto;
+        this.lineEndings = lineEndings;
 
         KeyHook.addListener(this);
     }
 
-    public void save(File file) throws IOException, InterruptedException {
+    public void save(@NonNull File file) throws IOException, InterruptedException {
         if (this.atto.getMode() == EditorMode.SAVE_QUERY) {
             this.atto.setMode(EditorMode.WAITING);
             this.edited = false;
             this.file = file;
 
-            String contents = String.join(System.lineSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
+            String contents = String.join(this.lineEndings.getSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
 
             Files.write(this.file.toPath(), contents.getBytes());
 
-            this.atto.setStatus(String.format("Saved file : %s", this.file.getCanonicalPath()));
+            this.atto.setStatus(String.format(LangProvider.get("status.savedfile"), this.file.getCanonicalPath()));
             this.atto.setMode(EditorMode.EDITING_TEXT);
+            this.atto.draw();
 
             ThreadHelper.executeLater(() -> {
                 try {
@@ -61,17 +69,19 @@ public class TextEditorScreen implements Screen, KeyListener {
         }
     }
 
-    public void load(File file) throws IOException, InterruptedException {
+    public void load(@Nullable File file) throws IOException, InterruptedException {
         this.file = file;
         this.map = new CharMap();
 
         if ((this.file != null) && file.exists() && file.isFile()) {
-            this.atto.setStatus(String.format("Reading file : %s", this.file.getCanonicalPath()));
+            this.atto.setStatus(String.format(LangProvider.get("status.readingfile"), this.file.getCanonicalPath()));
             this.atto.draw();
 
-            if (this.file.exists()) {
-                String contents = new String(Files.readAllBytes(this.file.toPath())).replace("\r", "").replace("\t", "    ");
-                String[] lines = contents.split("\n");
+            if (this.file.isFile()) {
+                String contents = new String(Files.readAllBytes(this.file.toPath())).replace("\t", "    ");
+                String[] lines = contents.replace("\r", "\n").split("\n");
+
+                this.lineEndings = LineEndings.detect(contents);
 
                 for (int y = 0; y != lines.length; y++) {
                     char[] line = lines[y].toCharArray();
@@ -84,14 +94,15 @@ public class TextEditorScreen implements Screen, KeyListener {
 
             this.atto.setStatus(this.file.getCanonicalPath());
         } else {
-            this.atto.setStatus("(New File)");
+            this.atto.setStatus(LangProvider.get("status.newfile"));
         }
 
         this.atto.setMode(EditorMode.EDITING_TEXT);
+        this.atto.draw();
     }
 
     @Override
-    public void draw(ConsoleWindow window, Dimension size) throws IOException, InterruptedException {
+    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
 
         // Write contents.
         window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.WHITE).cursorTo(0, Atto.TOP_INDENT); // Reset.
@@ -112,32 +123,30 @@ public class TextEditorScreen implements Screen, KeyListener {
 
     @SneakyThrows
     @Override
-    public void onKey(int key) {
+    public void onKey(char key, boolean alt, boolean control) {
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
-            switch (key) {
+            if (control) {
+                switch (key) {
 
-                case 19: // ^S
-                case 15: // ^O
-                    return; // These are used in the InterfaceScreen.
+                    case 'l': // ^L
+                        this.map.clearLine(this.cursor.y);
+                        this.cursor.x = 0;
+                        this.atto.draw();
 
-                case 12: // ^L
-                    this.map.clearLine(this.cursor.y);
-                    this.atto.draw();
+                        return;
 
-                    return;
-
-                default: {
-                    if (this.inserting) {
-                        this.map.set(this.cursor.x, this.cursor.y, (char) key);
-                    } else {
-                        this.map.insert(this.cursor.x, this.cursor.y, (char) key);
-                    }
-
-                    this.edited = true;
-                    this.move(1, 0);
-
-                    return;
                 }
+            } else {
+                if (this.overwriting) {
+                    this.map.set(this.cursor.x, this.cursor.y, key);
+                } else {
+                    this.map.insert(this.cursor.x, this.cursor.y, key);
+                }
+
+                this.edited = true;
+                this.move(1, 0);
+
+                return;
             }
         }
     }
@@ -177,6 +186,14 @@ public class TextEditorScreen implements Screen, KeyListener {
     public void onKey(InputKey key) {
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
             switch (key) {
+
+                case END: {
+                    this.lineEndings = this.lineEndings.getNextInList();
+                    this.edited = true;
+                    this.atto.draw();
+
+                    return;
+                }
 
                 case PAGE_UP: {
                     if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
@@ -239,7 +256,7 @@ public class TextEditorScreen implements Screen, KeyListener {
 
                 // Editing
                 case ENTER: {
-                    if (!this.inserting) {
+                    if (!this.overwriting) {
                         this.cursor.x = this.map.getLength(this.cursor.y + 1);
                     }
 
@@ -250,7 +267,7 @@ public class TextEditorScreen implements Screen, KeyListener {
 
                 case BACK_SPACE: {
                     if (this.cursor.x > 0) {
-                        if (this.inserting) {
+                        if (this.overwriting) {
                             this.map.set(this.cursor.x - 1, this.cursor.y, ' ');
                         } else {
                             this.map.remove(this.cursor.x - 1, this.cursor.y);
@@ -266,17 +283,17 @@ public class TextEditorScreen implements Screen, KeyListener {
                 }
 
                 case INSERT: {
-                    this.inserting = !this.inserting;
+                    this.overwriting = !this.overwriting;
                     this.atto.draw();
 
                     return;
                 }
 
                 case TAB: {
-                    this.onKey(' ');
-                    this.onKey(' ');
-                    this.onKey(' ');
-                    this.onKey(' ');
+                    this.onKey(' ', false, false);
+                    this.onKey(' ', false, false);
+                    this.onKey(' ', false, false);
+                    this.onKey(' ', false, false);
 
                     return;
                 }
@@ -294,12 +311,11 @@ public class TextEditorScreen implements Screen, KeyListener {
                     this.cursor.y = 0;
                     this.scroll.x = 0;
                     this.scroll.y = 0;
+                    this.atto.draw();
 
                     return;
                 }
 
-                case ALT:
-                case END:
                 default:
                     return;
 

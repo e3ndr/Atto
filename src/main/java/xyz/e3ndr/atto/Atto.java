@@ -16,16 +16,16 @@ import lombok.NonNull;
 import lombok.Setter;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.ui.EditorMode;
-import xyz.e3ndr.atto.ui.EditorScreen;
 import xyz.e3ndr.atto.ui.InterfaceScreen;
 import xyz.e3ndr.atto.ui.LineEndings;
+import xyz.e3ndr.atto.ui.TextEditorScreen;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
 
 @Getter
 @Setter
 public class Atto {
-    public static final String VERSION = "2.0.0";
+    public static final String VERSION = "2.1.0";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static final int BOTTOM_INDENT = 1;
@@ -36,7 +36,7 @@ public class Atto {
 
     private @NonNull @Setter(AccessLevel.NONE) Dimension size = new Dimension();
     private @NonNull @Setter(AccessLevel.NONE) InterfaceScreen interfaceScreen;
-    private @NonNull @Setter(AccessLevel.NONE) EditorScreen editorScreen;
+    private @NonNull @Setter(AccessLevel.NONE) TextEditorScreen editorScreen;
     private @NonNull @Setter(AccessLevel.NONE) ConsoleWindow window;
 
     public Atto(@Nullable File file, ConfigFile config) throws IOException, InterruptedException {
@@ -49,7 +49,7 @@ public class Atto {
         LangProvider.setLanguage(config.getLanguage());
 
         this.interfaceScreen = new InterfaceScreen(this);
-        this.editorScreen = new EditorScreen(this, LineEndings.fromString(config.getDefaultLineEndings()));
+        this.editorScreen = new TextEditorScreen(this, LineEndings.fromString(config.getDefaultLineEndings()));
 
         this.editorScreen.load(file);
 

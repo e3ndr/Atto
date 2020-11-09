@@ -19,6 +19,10 @@ public class InterfaceScreen implements Screen, KeyListener {
     private StringBuilder buffer = new StringBuilder();
     private String query = "";
 
+    // This handles pressing TAB to cycle through files.
+    private File lastTab = new File("./"); // Set it so the program doesn't get confused.
+    private int tabIndex = 0;
+
     private Atto atto;
 
     public InterfaceScreen(@NonNull Atto atto) {
@@ -31,11 +35,12 @@ public class InterfaceScreen implements Screen, KeyListener {
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
         // Write title bar
         String lineEndings = this.atto.getEditorScreen().getLineEndings().toString();
+        String middleText = String.format("Atto %s", Atto.VERSION);
 
         window.cursorTo(0, 0).setBackgroundColor(ConsoleColor.WHITE).setTextColor(ConsoleColor.BLACK).clearLine();
         window.write(makeTopBarText());
-        window.cursorTo(getPaddingToCenter(4, size.width), 0).write("Atto");
-        window.cursorTo(size.width - lineEndings.length() - 1, 0).write(lineEndings);
+        window.writeAt(getPaddingToCenter(middleText.length(), size.width), 0, middleText);
+        window.writeAt(size.width - lineEndings.length() - 1, 0, lineEndings);
 
         // Write bottom bar
         window.cursorTo(0, size.height - Atto.BOTTOM_INDENT).setBackgroundColor(ConsoleColor.WHITE).setTextColor(ConsoleColor.BLACK).clearLine();
@@ -104,28 +109,31 @@ public class InterfaceScreen implements Screen, KeyListener {
     }
 
     @Override
-    public void onKey(int key) {
+    public void onKey(char key, boolean alt, boolean control) {
         try {
-            switch (key) {
-                case 15: // ^O
-                    this.atto.getInterfaceScreen().triggerOpenDialog();
-                    this.atto.draw();
-
-                    return;
-
-                case 19: // ^S
-                    this.atto.getInterfaceScreen().triggerSaveDialog();
-                    this.atto.draw();
-
-                    return;
-
-                default: {
-                    if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
-                        this.buffer.append((char) key);
+            if (control) {
+                switch (key) {
+                    case 'o': // ^O
+                        this.atto.getInterfaceScreen().triggerOpenDialog();
                         this.atto.draw();
-                    }
 
-                    return;
+                        return;
+
+                    case 's': // ^S
+                        this.atto.getInterfaceScreen().triggerSaveDialog();
+                        this.atto.draw();
+
+                        return;
+
+                    default: {
+
+                        return;
+                    }
+                }
+            } else {
+                if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
+                    this.buffer.append(key);
+                    this.atto.draw();
                 }
             }
         } catch (IOException e) {
@@ -135,56 +143,124 @@ public class InterfaceScreen implements Screen, KeyListener {
 
     @Override
     public void onKey(InputKey key) {
-        if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
-            switch (key) {
+        try {
+            if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
+                switch (key) {
 
-                case ENTER: {
-                    try {
-                        if (this.atto.getMode() == EditorMode.SAVE_QUERY) {
-                            this.atto.getEditorScreen().save(new File(this.buffer.toString()));
-                        } else if (this.atto.getMode() == EditorMode.OPEN_QUERY) {
-                            this.atto.getEditorScreen().load(new File(this.buffer.toString()));
+                    case ENTER: {
+                        try {
+                            if (this.atto.getMode() == EditorMode.SAVE_QUERY) {
+                                this.atto.getEditorScreen().save(this.getFileFromBuffer());
+                            } else if (this.atto.getMode() == EditorMode.OPEN_QUERY) {
+                                this.atto.getEditorScreen().load(this.getFileFromBuffer());
+                            }
+                        } catch (IOException | InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException | InterruptedException e) {
-                        e.printStackTrace();
+
+                        return;
                     }
 
-                    return;
-                }
+                    case BACK_SPACE: {
+                        if (this.buffer.length() > 0) {
+                            this.buffer.deleteCharAt(this.buffer.length() - 1);
+                            this.atto.draw();
+                        }
 
-                case BACK_SPACE: {
-                    if (this.buffer.length() > 0) {
-                        this.buffer.deleteCharAt(this.buffer.length() - 1);
+                        return;
+                    }
+
+                    case ESCAPE: {
+                        this.atto.setMode(EditorMode.EDITING_TEXT);
                         this.atto.draw();
+
+                        return;
                     }
 
-                    return;
+                    case TAB: {
+                        File file = this.getFileFromBuffer();
+
+                        if (!file.exists()) {
+                            file = this.lastTab;
+                        } else if (file.getParentFile().equals(this.lastTab)) {
+                            file = this.lastTab;
+                        } else if (file.isFile()) {
+                            file = file.getParentFile();
+                        }
+
+                        if (!file.equals(this.lastTab)) {
+                            this.tabIndex = 0;
+                        }
+
+                        this.lastTab = file;
+
+                        File[] possibilities = file.listFiles();
+
+                        if (this.tabIndex >= possibilities.length) {
+                            this.tabIndex = 0;
+                        }
+
+                        File selected = possibilities[this.tabIndex++];
+
+                        this.buffer = new StringBuilder(selected.getCanonicalPath());
+
+                        if (selected.isDirectory()) {
+                            this.buffer.append(File.separator);
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    // Resets the lastTab, so you can tab through children
+                    case DOWN: {
+                        this.lastTab = this.getFileFromBuffer();
+                        this.tabIndex = 0;
+
+                        return;
+                    }
+
+                    // Jumps up a directory
+                    case UP: {
+                        char end = this.buffer.charAt(this.buffer.length() - 1);
+
+                        if ((end == '\\') || (end == '/')) {
+                            this.buffer.deleteCharAt(this.buffer.length() - 1);
+                        }
+
+                        int last = Math.max(this.buffer.lastIndexOf("/"), this.buffer.lastIndexOf("\\"));
+                        this.tabIndex = 0;
+
+                        if (last > -1) {
+                            this.buffer.delete(last + 1, this.buffer.length());
+
+                            this.atto.draw();
+                        }
+
+                        return;
+                    }
+
+                    case PAGE_UP:
+                    case PAGE_DOWN:
+                    case LEFT:
+                    case RIGHT:
+                    case INSERT:
+                    case DELETE:
+                    case HOME:
+                    case END:
+                    default:
+                        return;
+
                 }
-
-                case ESCAPE: {
-                    this.atto.setMode(EditorMode.EDITING_TEXT);
-                    this.atto.draw();
-
-                    return;
-                }
-
-                case PAGE_UP:
-                case PAGE_DOWN:
-                case UP:
-                case DOWN:
-                case LEFT:
-                case RIGHT:
-                case INSERT:
-                case TAB:
-                case DELETE:
-                case HOME:
-                case ALT:
-                case END:
-                default:
-                    return;
-
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+    }
+
+    private File getFileFromBuffer() {
+        return new File(this.buffer.toString());
     }
 
     public static int getPaddingToCenter(int length, int width) {
