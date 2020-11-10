@@ -57,6 +57,12 @@ public class Atto {
 
         // Auto redraw on a size change.
         try {
+            TimeUnit.MILLISECONDS.sleep(250);
+
+            // Occasionally when first starting, JAnsi won't have the native
+            // library loaded so the console gets filled with garbage.
+            this.draw();
+
             while (true) {
                 TimeUnit.MILLISECONDS.sleep(10);
 
