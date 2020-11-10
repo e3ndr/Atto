@@ -25,7 +25,7 @@ import xyz.e3ndr.consoleutil.ConsoleWindow;
 @Getter
 @Setter
 public class Atto {
-    public static final String VERSION = "2.1.1";
+    public static final String VERSION = "2.1.2";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static final int BOTTOM_INDENT = 1;
@@ -40,7 +40,7 @@ public class Atto {
     private @NonNull @Setter(AccessLevel.NONE) ConsoleWindow window;
 
     public Atto(@Nullable File file, ConfigFile config) throws IOException, InterruptedException {
-        this.window = new ConsoleWindow();
+        this.window = new ConsoleWindow().setAutoFlushing(false);
 
         if ((config.getWidth() > 0) && (config.getHeight() > 0)) {
             ConsoleUtil.setSize(config.getWidth(), config.getHeight());
@@ -87,7 +87,7 @@ public class Atto {
             this.interfaceScreen.draw(this.window, this.size);
             this.editorScreen.draw(this.window, this.size);
 
-            this.window.restoreCursor().update();
+            this.window.restoreCursorPosition().update();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

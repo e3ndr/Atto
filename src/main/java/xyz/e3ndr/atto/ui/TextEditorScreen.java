@@ -16,9 +16,9 @@ import xyz.e3ndr.atto.ThreadHelper;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
 import xyz.e3ndr.atto.util.Location;
-import xyz.e3ndr.consoleutil.ConsoleColor;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -103,10 +103,9 @@ public class TextEditorScreen implements Screen, KeyListener {
 
     @Override
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
-
-        // Write contents.
         window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.WHITE).cursorTo(0, Atto.TOP_INDENT); // Reset.
 
+        // Write contents.
         String[] lines = this.map.string(this.scroll.x, this.scroll.y, (size.height - Atto.TOP_INDENT) - Atto.BOTTOM_INDENT, size.width, false);
         int num = 0;
 
@@ -117,7 +116,7 @@ public class TextEditorScreen implements Screen, KeyListener {
 
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
             window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);
-            window.saveCursor();
+            window.saveCursorPosition();
         }
     }
 
@@ -160,6 +159,14 @@ public class TextEditorScreen implements Screen, KeyListener {
         // Convert to 0index
         size.height--;
         size.width--;
+
+        if ((this.cursor.x == 0) && (dX < 0)) {
+            dX = 0;
+        }
+
+        if ((this.cursor.y == 0) && (dY < 0)) {
+            dY = 0;
+        }
 
         int newX = (this.cursor.x - this.scroll.x) + dX;
         int newY = (this.cursor.y - this.scroll.y) + dY;

@@ -9,8 +9,8 @@ import java.util.List;
 import lombok.NonNull;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.lang.LangProvider;
-import xyz.e3ndr.consoleutil.ConsoleColor;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -37,13 +37,13 @@ public class InterfaceScreen implements Screen, KeyListener {
         String lineEndings = this.atto.getEditorScreen().getLineEndings().toString();
         String middleText = String.format("Atto %s", Atto.VERSION);
 
-        window.cursorTo(0, 0).setBackgroundColor(ConsoleColor.WHITE).setTextColor(ConsoleColor.BLACK).clearLine();
+        window.cursorTo(0, 0).setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK).clearLine();
         window.write(makeTopBarText());
         window.writeAt(getPaddingToCenter(middleText.length(), size.width), 0, middleText);
         window.writeAt(size.width - lineEndings.length() - 1, 0, lineEndings);
 
         // Write bottom bar
-        window.cursorTo(0, size.height - Atto.BOTTOM_INDENT).setBackgroundColor(ConsoleColor.WHITE).setTextColor(ConsoleColor.BLACK).clearLine();
+        window.cursorTo(0, size.height - Atto.BOTTOM_INDENT).setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK).clearLine();
 
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
             String bottom = LangProvider.get("hint.bottom");
@@ -55,15 +55,15 @@ public class InterfaceScreen implements Screen, KeyListener {
 
             window.write(splitQuery[0]);
 
-            window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.WHITE);
+            window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.GRAY);
             window.write(this.buffer).write(" ");
 
-            window.setBackgroundColor(ConsoleColor.WHITE).setTextColor(ConsoleColor.BLACK);
+            window.setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK);
             window.write(splitQuery[1]);
 
             // Move cursor
             window.cursorTo(splitQuery[0].length() + this.buffer.length(), size.height - Atto.BOTTOM_INDENT);
-            window.saveCursor();
+            window.saveCursorPosition();
         }
     }
 
@@ -128,7 +128,7 @@ public class InterfaceScreen implements Screen, KeyListener {
                     }
 
                     case 'w': // ^W
-                    	System.exit(0);
+                        System.exit(0);
 
                     default:
                         return;
