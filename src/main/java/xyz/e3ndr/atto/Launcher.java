@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import xyz.e3ndr.atto.config.ConfigFile;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 
 @Command(name = "atto", mixinStandardHelpOptions = true, version = "Atto-" + Atto.VERSION, description = "Opens Atto")
@@ -41,10 +42,8 @@ public class Launcher implements Runnable {
                 config = new ConfigFile();
             }
 
-            String contents = Atto.GSON.toJson(config);
-            byte[] bytes = contents.getBytes(StandardCharsets.UTF_8);
-            // Update config file.
-            Files.write(configFile.toPath(), bytes);
+            // Replace empty keys, and reset formatting.
+            config.save();
 
             new Atto(this.file, config);
         } catch (IOException | InterruptedException e) {

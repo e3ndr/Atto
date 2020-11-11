@@ -129,4 +129,16 @@ public class CharMap {
         return result;
     }
 
+    public char getChar(int x, int y) {
+        if (y < this.map.length) {
+            char[] xArr = this.map[y];
+
+            if (x < xArr.length) {
+                return xArr[x];
+            }
+        }
+
+        return ' ';
+    }
+
 }

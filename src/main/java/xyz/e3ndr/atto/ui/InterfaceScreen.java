@@ -8,9 +8,10 @@ import java.util.List;
 
 import lombok.NonNull;
 import xyz.e3ndr.atto.Atto;
+import xyz.e3ndr.atto.config.ConfigFile.InterfaceTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
+import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
-import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -35,19 +36,29 @@ public class InterfaceScreen implements Screen, KeyListener {
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
         // Write title bar
         String lineEndings = this.atto.getEditorScreen().getLineEndings().toString();
+        InterfaceTheme theme = this.atto.getConfig().getInterfaceTheme();
         String middleText = String.format("Atto %s", Atto.VERSION);
 
-        window.cursorTo(0, 0).setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK).clearLine();
+        window.cursorTo(0, 0);
+        window.setBackgroundColor(theme.getBackgroundColor());
+        window.setTextColor(theme.getTextColor());
+        window.setAttributes(theme.getTextAttributes());
+        window.clearLine();
+
         window.write(makeTopBarText());
-        window.writeAt(getPaddingToCenter(middleText.length(), size.width), 0, middleText);
+        window.writeAt(MiscUtil.getPaddingToCenter(middleText.length(), size.width), 0, middleText);
         window.writeAt(size.width - lineEndings.length() - 1, 0, lineEndings);
 
         // Write bottom bar
-        window.cursorTo(0, size.height - Atto.BOTTOM_INDENT).setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK).clearLine();
+        window.cursorTo(0, size.height - Atto.BOTTOM_INDENT);
+        window.setBackgroundColor(theme.getBackgroundColor());
+        window.setTextColor(theme.getTextColor());
+        window.setAttributes(theme.getTextAttributes());
+        window.clearLine();
 
         if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
             String bottom = LangProvider.get("hint.bottom");
-            int padding = getPaddingToCenter(bottom.length(), size.width);
+            int padding = MiscUtil.getPaddingToCenter(bottom.length(), size.width);
 
             window.cursorTo(padding, size.height - Atto.BOTTOM_INDENT).write(bottom);
         } else if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
@@ -55,10 +66,11 @@ public class InterfaceScreen implements Screen, KeyListener {
 
             window.write(splitQuery[0]);
 
-            window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.GRAY);
-            window.write(this.buffer).write(" ");
+            // We invert the color here
+            window.setBackgroundColor(theme.getTextColor()).setTextColor(theme.getBackgroundColor());
+            window.write(this.buffer).write(' ');
 
-            window.setBackgroundColor(ConsoleColor.GRAY).setTextColor(ConsoleColor.BLACK);
+            window.setBackgroundColor(theme.getBackgroundColor()).setTextColor(theme.getTextColor());
             window.write(splitQuery[1]);
 
             // Move cursor
@@ -265,10 +277,6 @@ public class InterfaceScreen implements Screen, KeyListener {
 
     private File getFileFromBuffer() {
         return new File(this.buffer.toString());
-    }
-
-    public static int getPaddingToCenter(int length, int width) {
-        return (width / 2) - (length / 2);
     }
 
 }

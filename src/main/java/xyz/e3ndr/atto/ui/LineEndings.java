@@ -13,22 +13,6 @@ public enum LineEndings {
     private @Getter String separator;
     private String text;
 
-    public LineEndings getNextInList() {
-        switch (this) {
-            case MACINTOSH:
-                return WINDOWS;
-
-            case WINDOWS:
-                return UNIX;
-
-            case UNIX:
-                return MACINTOSH;
-
-            default: // hush mr compiliey
-                return UNIX;
-        }
-    }
-
     public static LineEndings detect(@NonNull String input) {
         boolean CR = input.contains("\r");
         boolean LF = input.contains("\n");

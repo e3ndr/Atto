@@ -14,10 +14,10 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import xyz.e3ndr.atto.config.ConfigFile;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.ui.EditorMode;
 import xyz.e3ndr.atto.ui.InterfaceScreen;
-import xyz.e3ndr.atto.ui.LineEndings;
 import xyz.e3ndr.atto.ui.TextEditorScreen;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
@@ -38,18 +38,20 @@ public class Atto {
     private @NonNull @Setter(AccessLevel.NONE) InterfaceScreen interfaceScreen;
     private @NonNull @Setter(AccessLevel.NONE) TextEditorScreen editorScreen;
     private @NonNull @Setter(AccessLevel.NONE) ConsoleWindow window;
+    private @NonNull @Setter(AccessLevel.NONE) ConfigFile config;
 
     public Atto(@Nullable File file, ConfigFile config) throws IOException, InterruptedException {
         this.window = new ConsoleWindow().setAutoFlushing(false);
+        this.config = config;
 
-        if ((config.getWidth() > 0) && (config.getHeight() > 0)) {
-            ConsoleUtil.setSize(config.getWidth(), config.getHeight());
+        if ((this.config.getWidth() > 0) && (this.config.getHeight() > 0)) {
+            ConsoleUtil.setSize(this.config.getWidth(), this.config.getHeight());
         }
 
-        LangProvider.setLanguage(config.getLanguage());
+        LangProvider.setLanguage(this.config.getLanguage());
 
         this.interfaceScreen = new InterfaceScreen(this);
-        this.editorScreen = new TextEditorScreen(this, LineEndings.fromString(config.getDefaultLineEndings()));
+        this.editorScreen = new TextEditorScreen(this, this.config.getDefaultLineEndings());
 
         this.editorScreen.load(file);
 
@@ -66,11 +68,11 @@ public class Atto {
             while (true) {
                 TimeUnit.MILLISECONDS.sleep(10);
 
-                boolean force = config.isForceSize() && ((config.getWidth() != this.size.width) || (config.getHeight() != this.size.height));
+                boolean force = this.config.isForceSize() && ((this.config.getWidth() != this.size.width) || (this.config.getHeight() != this.size.height));
 
                 if (!ConsoleUtil.getSize().equals(this.size) || force) {
                     if (force) {
-                        ConsoleUtil.setSize(config.getWidth(), config.getHeight());
+                        ConsoleUtil.setSize(this.config.getWidth(), this.config.getHeight());
                     }
 
                     this.draw();

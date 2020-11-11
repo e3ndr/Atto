@@ -13,12 +13,13 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.ThreadHelper;
+import xyz.e3ndr.atto.config.ConfigFile.TextEditorTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
+import xyz.e3ndr.atto.util.EnumUtil;
 import xyz.e3ndr.atto.util.Location;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
-import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -103,20 +104,25 @@ public class TextEditorScreen implements Screen, KeyListener {
 
     @Override
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
-        window.setBackgroundColor(ConsoleColor.BLACK).setTextColor(ConsoleColor.WHITE).cursorTo(0, Atto.TOP_INDENT); // Reset.
+        if (this.atto.getMode() != EditorMode.OPTIONS) {
+            TextEditorTheme theme = this.atto.getConfig().getTextEditorTheme();
 
-        // Write contents.
-        String[] lines = this.map.string(this.scroll.x, this.scroll.y, (size.height - Atto.TOP_INDENT) - Atto.BOTTOM_INDENT, size.width, false);
-        int num = 0;
+            window.setBackgroundColor(theme.getBackgroundColor()).setTextColor(theme.getTextColor());
+            window.setAttributes(theme.getTextAttributes()).cursorTo(0, Atto.TOP_INDENT); // Reset.
 
-        for (String line : lines) {
-            window.cursorTo(0, Atto.TOP_INDENT + num).write(line);
-            num++;
-        }
+            // Write contents.
+            String[] lines = this.map.string(this.scroll.x, this.scroll.y, (size.height - Atto.TOP_INDENT) - Atto.BOTTOM_INDENT, size.width, false);
+            int num = 0;
 
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
-            window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);
-            window.saveCursorPosition();
+            for (String line : lines) {
+                window.cursorTo(0, Atto.TOP_INDENT + num).write(line);
+                num++;
+            }
+
+            if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+                window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);
+                window.saveCursorPosition();
+            }
         }
     }
 
@@ -188,6 +194,10 @@ public class TextEditorScreen implements Screen, KeyListener {
         this.atto.draw();
     }
 
+    public char getCharAtCursor() {
+        return this.map.getChar(this.cursor.x + this.scroll.x, this.cursor.y + this.scroll.y);
+    }
+
     @SneakyThrows
     @Override
     public void onKey(InputKey key) {
@@ -195,7 +205,7 @@ public class TextEditorScreen implements Screen, KeyListener {
             switch (key) {
 
                 case END: {
-                    this.lineEndings = this.lineEndings.getNextInList();
+                    this.lineEndings = EnumUtil.getNext(this.lineEndings);
                     this.edited = true;
                     this.atto.draw();
 
