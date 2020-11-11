@@ -1,20 +1,26 @@
 package xyz.e3ndr.atto.config.menu;
 
-public class IntegerInteractable implements InteractableList<Integer> {
+import lombok.NonNull;
 
-    @Override
-    public String getValue(Integer obj) {
-        return obj.toString();
+public class IntegerInteractable extends Interactable<Integer> implements InteractableList {
+
+    public IntegerInteractable(Object holder, String prefix, String var) {
+        super(holder, prefix, var);
     }
 
     @Override
-    public Integer increment(Integer obj) {
-        return obj++;
+    public @NonNull String getValue() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        return String.valueOf(get());
     }
 
     @Override
-    public Integer decrement(Integer obj) {
-        return obj--;
+    public void increment() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        this.set(this.get() + 1);
+    }
+
+    @Override
+    public void decrement() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        this.set(this.get() - 1);
     }
 
 }

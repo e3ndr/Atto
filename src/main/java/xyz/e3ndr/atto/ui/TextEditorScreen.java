@@ -13,7 +13,7 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.ThreadHelper;
-import xyz.e3ndr.atto.config.ConfigFile.TextEditorTheme;
+import xyz.e3ndr.atto.config.AttoConfig.TextEditorTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
 import xyz.e3ndr.atto.util.EnumUtil;
@@ -103,7 +103,7 @@ public class TextEditorScreen implements Screen, KeyListener {
     }
 
     @Override
-    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
+    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
         if (this.atto.getMode() != EditorMode.OPTIONS) {
             TextEditorTheme theme = this.atto.getConfig().getTextEditorTheme();
 

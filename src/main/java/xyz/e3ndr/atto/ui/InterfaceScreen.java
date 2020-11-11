@@ -8,7 +8,7 @@ import java.util.List;
 
 import lombok.NonNull;
 import xyz.e3ndr.atto.Atto;
-import xyz.e3ndr.atto.config.ConfigFile.InterfaceTheme;
+import xyz.e3ndr.atto.config.AttoConfig.InterfaceTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
@@ -33,7 +33,7 @@ public class InterfaceScreen implements Screen, KeyListener {
     }
 
     @Override
-    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
+    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
         // Write title bar
         String lineEndings = this.atto.getEditorScreen().getLineEndings().toString();
         InterfaceTheme theme = this.atto.getConfig().getInterfaceTheme();
@@ -132,6 +132,13 @@ public class InterfaceScreen implements Screen, KeyListener {
                         return;
                     }
 
+                    case 'p': { // ^P
+                        this.atto.setMode(EditorMode.OPTIONS);
+                        this.atto.draw();
+
+                        return;
+                    }
+
                     case 's': { // ^S
                         this.atto.getInterfaceScreen().triggerSaveDialog();
                         this.atto.draw();
@@ -153,7 +160,7 @@ public class InterfaceScreen implements Screen, KeyListener {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            this.atto.exception(e);
         }
     }
 
@@ -271,7 +278,7 @@ public class InterfaceScreen implements Screen, KeyListener {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            this.atto.exception(e);
         }
     }
 

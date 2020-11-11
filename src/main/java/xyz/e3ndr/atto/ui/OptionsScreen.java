@@ -1,11 +1,13 @@
 package xyz.e3ndr.atto.ui;
 
 import java.awt.Dimension;
-import java.io.IOException;
+import java.util.List;
 
 import lombok.NonNull;
 import xyz.e3ndr.atto.Atto;
-import xyz.e3ndr.atto.config.ConfigFile.InterfaceTheme;
+import xyz.e3ndr.atto.config.AttoConfig.InterfaceTheme;
+import xyz.e3ndr.atto.config.menu.Interactable;
+import xyz.e3ndr.atto.config.menu.InteractableList;
 import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
@@ -13,8 +15,8 @@ import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
 
 public class OptionsScreen implements Screen, KeyListener {
+    private List<Interactable<?>> options;
     private int optionIndex = 0;
-    private Object[] options;
 
     private Atto atto;
 
@@ -22,10 +24,12 @@ public class OptionsScreen implements Screen, KeyListener {
         this.atto = atto;
 
         KeyHook.addListener(this);
+
+        this.options = this.atto.getConfig().getInteractions();
     }
 
     @Override
-    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws IOException, InterruptedException {
+    public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
         if (this.atto.getMode() == EditorMode.OPTIONS) {
             // Write title bar
             String middleText = String.format("Atto %s", Atto.VERSION);
@@ -35,70 +39,119 @@ public class OptionsScreen implements Screen, KeyListener {
             window.setBackgroundColor(theme.getBackgroundColor());
             window.setTextColor(theme.getTextColor());
             window.setAttributes(theme.getTextAttributes());
-            window.clearLine();
+            window.clearScreen();
 
             window.writeAt(MiscUtil.getPaddingToCenter(middleText.length(), size.width), 0, middleText);
+
+            int cursorIndex = 0;
+            for (Interactable<?> interactable : this.options) {
+                String name = interactable.getName();
+                String value = interactable.getValue();
+
+                window.cursorTo(3, cursorIndex + 2).write(name);
+                window.write(" ");
+
+                if (this.optionIndex == cursorIndex) {
+                    // Invert colors
+                    window.setBackgroundColor(theme.getTextColor());
+                    window.setTextColor(theme.getBackgroundColor());
+                    window.cursorTo(35, cursorIndex + 2).saveCursorPosition();
+                }
+
+                // TODO calculate the widest option name
+                window.cursorTo(35, cursorIndex + 2).write(value);
+                window.setBackgroundColor(theme.getBackgroundColor());
+                window.setTextColor(theme.getTextColor());
+
+                cursorIndex++;
+            }
         }
     }
 
     @Override
-    public void onKey(char key, boolean alt, boolean control) {
-        if (this.atto.getMode() == EditorMode.OPTIONS) {
-            if (control) {
-                switch (key) {
-                    case 'p': { // ^P
-                        this.atto.setMode(EditorMode.OPTIONS);
-                        this.atto.draw();
-                        return;
-                    }
-
-                    default:
-                        return;
-
-                }
-            }
-        }
-    }
+    public void onKey(char key, boolean alt, boolean control) {}
 
     @Override
     public void onKey(InputKey key) {
-        if (this.atto.getMode() == EditorMode.OPTIONS) {
-            switch (key) {
+        try {
+            if (this.atto.getMode() == EditorMode.OPTIONS) {
+                switch (key) {
 
-                case ESCAPE: {
+                    case ESCAPE: {
+                        this.atto.setMode(EditorMode.EDITING_TEXT);
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    case UP: {
+                        this.optionIndex--;
+
+                        if (this.optionIndex < 0) {
+                            this.optionIndex = this.options.size() - 1;
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    case TAB:
+                    case DOWN: {
+                        this.optionIndex++;
+
+                        if (this.optionIndex >= this.options.size()) {
+                            this.optionIndex = 0;
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    case BACK_SPACE:
+                    case DELETE:
+                    case LEFT: {
+                        Interactable<?> current = this.options.get(this.optionIndex);
+
+                        if (current instanceof InteractableList) {
+                            InteractableList list = (InteractableList) current;
+
+                            list.decrement();
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    case ENTER:
+                    case RIGHT: {
+                        Interactable<?> current = this.options.get(this.optionIndex);
+
+                        if (current instanceof InteractableList) {
+                            InteractableList list = (InteractableList) current;
+
+                            list.increment();
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                    case PAGE_UP:
+                    case PAGE_DOWN:
+                    case INSERT:
+                    case HOME:
+                    case END:
+                    default:
+                        break;
 
                 }
-
-                case UP: {
-
-                }
-
-                case TAB:
-                case DOWN: {
-
-                }
-
-                case BACK_SPACE:
-                case DELETE:
-                case LEFT: {
-
-                }
-
-                case ENTER:
-                case RIGHT: {
-
-                }
-
-                case PAGE_UP:
-                case PAGE_DOWN:
-                case INSERT:
-                case HOME:
-                case END:
-                default:
-                    break;
-
             }
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+            this.atto.exception(e);
         }
     }
-
 }

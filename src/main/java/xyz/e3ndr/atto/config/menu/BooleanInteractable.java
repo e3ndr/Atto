@@ -1,20 +1,24 @@
 package xyz.e3ndr.atto.config.menu;
 
-public class BooleanInteractable implements InteractableList<Boolean> {
+public class BooleanInteractable extends Interactable<Boolean> implements InteractableList {
 
-    @Override
-    public String getValue(Boolean obj) {
-        return obj.toString();
+    public BooleanInteractable(Object holder, String prefix, String var) {
+        super(holder, prefix, var);
     }
 
     @Override
-    public Boolean increment(Boolean obj) {
-        return !obj;
+    public String getValue() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        return String.valueOf(get());
     }
 
     @Override
-    public Boolean decrement(Boolean obj) {
-        return !obj;
+    public void increment() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        this.set(!this.get());
+    }
+
+    @Override
+    public void decrement() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        this.set(!this.get());
     }
 
 }

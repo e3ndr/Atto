@@ -1,9 +1,9 @@
 package xyz.e3ndr.atto.config.menu;
 
-public interface InteractableList<T> extends Interactable<T> {
+public interface InteractableList {
 
-    public T increment(T obj);
+    public void increment() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException;
 
-    public T decrement(T obj);
+    public void decrement() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException;
 
 }
