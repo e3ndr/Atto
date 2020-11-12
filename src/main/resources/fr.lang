@@ -9,6 +9,6 @@ status.savedfile=Fichier enregistré dans «%s»
 status.readingfile=Lecture de fichier «%s»
 status.newfile=(Nouveau Fichier)
 
-hint.bottom=^W Sortie ^S Enregistrer le fichier    ^O Fichier ouvert    ^L Effacer la ligne de texte
+hint.bottom=^W Sortie    ^S Enregistrer le fichier    ^O Fichier ouvert    ^L Effacer la ligne de texte    ^P Préférences
 
 misc.listseperator=, 

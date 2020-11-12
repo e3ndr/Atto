@@ -18,4 +18,23 @@ public class ThreadHelper {
         }).start();
     }
 
+    public static void repeat(@NonNull Runnable task, long millis, @NonNull String name) {
+        Thread t = (new Thread() {
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        Thread.sleep(millis);
+                        task.run();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        t.setName(name);
+        t.start();
+    }
+
 }
