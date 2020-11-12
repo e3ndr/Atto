@@ -45,6 +45,8 @@ public class OptionsScreen implements Screen, KeyListener {
 
             window.writeAt(MiscUtil.getPaddingToCenter(middleText.length(), size.width), 0, middleText);
 
+            // TODO calculate the widest option name
+            int padding = 35;
             int cursorIndex = 0;
             for (Interactable<?> interactable : this.options) {
                 String name = interactable.getName();
@@ -57,11 +59,10 @@ public class OptionsScreen implements Screen, KeyListener {
                     // Invert colors
                     window.setBackgroundColor(theme.getTextColor());
                     window.setTextColor(theme.getBackgroundColor());
-                    window.cursorTo(35, cursorIndex + 2).saveCursorPosition();
+                    window.cursorTo(padding, cursorIndex + 2).saveCursorPosition();
                 }
 
-                // TODO calculate the widest option name
-                window.cursorTo(35, cursorIndex + 2).write(value);
+                window.cursorTo(padding, cursorIndex + 2).write(value);
 
                 // Reset color
                 if (this.optionIndex == cursorIndex) {
