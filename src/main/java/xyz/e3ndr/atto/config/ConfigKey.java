@@ -1,4 +1,4 @@
-package xyz.e3ndr.atto.config.menu;
+package xyz.e3ndr.atto.config;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -8,10 +8,6 @@ import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
 @Target(FIELD)
-public @interface Interaction {
-
-    int upperBound() default Integer.MAX_VALUE;
-
-    int lowerBound() default Integer.MIN_VALUE;
+public @interface ConfigKey {
 
 }

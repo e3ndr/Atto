@@ -1,12 +1,14 @@
-package xyz.e3ndr.atto.config.menu;
+package xyz.e3ndr.atto.config.menu.interactions;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import xyz.e3ndr.atto.config.menu.Interaction;
 import xyz.e3ndr.reflectionlib.ReflectionLib;
 
 @NonNull
 @AllArgsConstructor
 public abstract class Interactable<T> {
+    protected Interaction annotation;
     protected Object holder;
     private String prefix;
     protected String var;

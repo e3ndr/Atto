@@ -49,6 +49,7 @@ public class Launcher implements Runnable {
             }
 
             // Replace empty keys, and reset formatting.
+            config.postInit();
             config.save();
 
             new Atto(this.file, this.debug, config);

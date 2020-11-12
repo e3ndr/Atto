@@ -17,6 +17,13 @@ public class EnumUtil {
         }
     }
 
+    public static String prettify(Enum<?> e) {
+        // Replace _'s with spaces, and capitalize the first letter.
+        String name = e.toString().replace('_', ' ');
+
+        return name.substring(0, 1) + name.substring(1).toLowerCase();
+    }
+
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public static <T extends Enum<?>> T getPrevious(T e) {

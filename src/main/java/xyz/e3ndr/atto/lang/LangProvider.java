@@ -10,15 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.NonNull;
+import xyz.e3ndr.atto.config.Language;
 
 public class LangProvider {
     private static Map<String, String> lang = new HashMap<>();
 
-    public static void setLanguage(@NonNull String language) {
+    public static void setLanguage(@NonNull Language language) {
         try {
             lang = new HashMap<>();
 
-            InputStream in = LangProvider.class.getResourceAsStream(String.format("/%s.lang", language));
+            InputStream in = LangProvider.class.getResourceAsStream(String.format("/%s.lang", language.name().toLowerCase()));
 
             StringBuilder sb = new StringBuilder();
             try (Reader reader = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {

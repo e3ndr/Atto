@@ -1,13 +1,15 @@
 package xyz.e3ndr.atto.ui;
 
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.List;
 
 import lombok.NonNull;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.config.AttoConfig.InterfaceTheme;
-import xyz.e3ndr.atto.config.menu.Interactable;
-import xyz.e3ndr.atto.config.menu.InteractableList;
+import xyz.e3ndr.atto.config.menu.interactions.Interactable;
+import xyz.e3ndr.atto.config.menu.interactions.InteractableList;
+import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
@@ -30,7 +32,7 @@ public class OptionsScreen implements Screen, KeyListener {
 
     @Override
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
-        if (this.atto.getMode() == EditorMode.OPTIONS) {
+        if (this.atto.getScreenAction() == ScreenAction.OPTIONS) {
             // Write title bar
             String middleText = String.format("Atto %s", Atto.VERSION);
             InterfaceTheme theme = this.atto.getConfig().getInterfaceTheme();
@@ -60,8 +62,12 @@ public class OptionsScreen implements Screen, KeyListener {
 
                 // TODO calculate the widest option name
                 window.cursorTo(35, cursorIndex + 2).write(value);
-                window.setBackgroundColor(theme.getBackgroundColor());
-                window.setTextColor(theme.getTextColor());
+
+                // Reset color
+                if (this.optionIndex == cursorIndex) {
+                    window.setBackgroundColor(theme.getBackgroundColor());
+                    window.setTextColor(theme.getTextColor());
+                }
 
                 cursorIndex++;
             }
@@ -69,16 +75,42 @@ public class OptionsScreen implements Screen, KeyListener {
     }
 
     @Override
-    public void onKey(char key, boolean alt, boolean control) {}
+    public void onKey(char key, boolean alt, boolean control) {
+        try {
+            if (control) {
+                switch (key) {
+
+                    case 'p': { // ^P
+                        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
+                            this.atto.setScreenAction(ScreenAction.OPTIONS);
+                        } else if (this.atto.getScreenAction() == ScreenAction.OPTIONS) {
+                            LangProvider.setLanguage(this.atto.getConfig().getLanguage());
+                            this.atto.getConfig().save();
+                            this.atto.setScreenAction(ScreenAction.EDITING_TEXT);
+                        }
+
+                        this.atto.draw();
+
+                        return;
+                    }
+
+                }
+            }
+        } catch (IOException e) {
+            this.atto.exception(e);
+        }
+    }
 
     @Override
     public void onKey(InputKey key) {
         try {
-            if (this.atto.getMode() == EditorMode.OPTIONS) {
+            if (this.atto.getScreenAction() == ScreenAction.OPTIONS) {
                 switch (key) {
 
                     case ESCAPE: {
-                        this.atto.setMode(EditorMode.EDITING_TEXT);
+                        LangProvider.setLanguage(this.atto.getConfig().getLanguage());
+                        this.atto.getConfig().save();
+                        this.atto.setScreenAction(ScreenAction.EDITING_TEXT);
                         this.atto.draw();
 
                         return;
@@ -150,7 +182,7 @@ public class OptionsScreen implements Screen, KeyListener {
 
                 }
             }
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException | IOException e) {
             this.atto.exception(e);
         }
     }

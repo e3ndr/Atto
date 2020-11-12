@@ -15,9 +15,9 @@ import lombok.NonNull;
 import lombok.Setter;
 import xyz.e3ndr.atto.config.AttoConfig;
 import xyz.e3ndr.atto.lang.LangProvider;
-import xyz.e3ndr.atto.ui.EditorMode;
 import xyz.e3ndr.atto.ui.InterfaceScreen;
 import xyz.e3ndr.atto.ui.OptionsScreen;
+import xyz.e3ndr.atto.ui.ScreenAction;
 import xyz.e3ndr.atto.ui.TextEditorScreen;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
@@ -25,13 +25,13 @@ import xyz.e3ndr.consoleutil.ConsoleWindow;
 @Getter
 @Setter
 public class Atto {
-    public static final String VERSION = "2.2.0-beta1";
+    public static final String VERSION = "2.2.0-beta2";
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static final int BOTTOM_INDENT = 1;
     public static final int TOP_INDENT = 1;
 
-    private @NonNull EditorMode mode = EditorMode.EDITING_TEXT;
+    private @NonNull ScreenAction screenAction = ScreenAction.EDITING_TEXT;
     private @NonNull String status;
 
     private @NonNull @Setter(AccessLevel.NONE) Dimension size = new Dimension();
@@ -101,9 +101,9 @@ public class Atto {
             this.size = ConsoleUtil.getSize();
 
             if (this.editorScreen.isEdited()) {
-                ConsoleUtil.setTitle("Atto *" + this.status);
+                ConsoleUtil.setTitle("Atto *" + LangProvider.get(this.status));
             } else {
-                ConsoleUtil.setTitle("Atto " + this.status);
+                ConsoleUtil.setTitle("Atto " + LangProvider.get(this.status));
             }
 
             this.interfaceScreen.draw(this.window, this.size);

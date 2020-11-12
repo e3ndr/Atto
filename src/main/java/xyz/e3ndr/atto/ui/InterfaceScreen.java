@@ -43,7 +43,10 @@ public class InterfaceScreen implements Screen, KeyListener {
         window.setBackgroundColor(theme.getBackgroundColor());
         window.setTextColor(theme.getTextColor());
         window.setAttributes(theme.getTextAttributes());
-        window.clearLine();
+
+        for (int line = 0; line != Atto.TOP_INDENT; line++) {
+            window.clearLine(line);
+        }
 
         window.write(makeTopBarText());
         window.writeAt(MiscUtil.getPaddingToCenter(middleText.length(), size.width), 0, middleText);
@@ -56,12 +59,12 @@ public class InterfaceScreen implements Screen, KeyListener {
         window.setAttributes(theme.getTextAttributes());
         window.clearLine();
 
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
             String bottom = LangProvider.get("hint.bottom");
             int padding = MiscUtil.getPaddingToCenter(bottom.length(), size.width);
 
             window.cursorTo(padding, size.height - Atto.BOTTOM_INDENT).write(bottom);
-        } else if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
+        } else if ((this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) || (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY)) {
             String[] splitQuery = this.query.split("%s", 2);
 
             window.write(splitQuery[0]);
@@ -80,8 +83,8 @@ public class InterfaceScreen implements Screen, KeyListener {
     }
 
     public void triggerOpenDialog() throws IOException {
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
-            this.atto.setMode(EditorMode.OPEN_QUERY);
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
+            this.atto.setScreenAction(ScreenAction.OPEN_QUERY);
 
             this.buffer = new StringBuilder(new File("./").getCanonicalPath()).append(File.separatorChar);
             this.query = LangProvider.get("dialog.open");
@@ -89,8 +92,8 @@ public class InterfaceScreen implements Screen, KeyListener {
     }
 
     public void triggerSaveDialog() throws IOException {
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
-            this.atto.setMode(EditorMode.SAVE_QUERY);
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
+            this.atto.setScreenAction(ScreenAction.SAVE_QUERY);
 
             File file = this.atto.getEditorScreen().getFile();
 
@@ -132,13 +135,6 @@ public class InterfaceScreen implements Screen, KeyListener {
                         return;
                     }
 
-                    case 'p': { // ^P
-                        this.atto.setMode(EditorMode.OPTIONS);
-                        this.atto.draw();
-
-                        return;
-                    }
-
                     case 's': { // ^S
                         this.atto.getInterfaceScreen().triggerSaveDialog();
                         this.atto.draw();
@@ -154,7 +150,7 @@ public class InterfaceScreen implements Screen, KeyListener {
 
                 }
             } else {
-                if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
+                if ((this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) || (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY)) {
                     this.buffer.append(key);
                     this.atto.draw();
                 }
@@ -167,14 +163,14 @@ public class InterfaceScreen implements Screen, KeyListener {
     @Override
     public void onKey(InputKey key) {
         try {
-            if ((this.atto.getMode() == EditorMode.SAVE_QUERY) || (this.atto.getMode() == EditorMode.OPEN_QUERY)) {
+            if ((this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) || (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY)) {
                 switch (key) {
 
                     case ENTER: {
                         try {
-                            if (this.atto.getMode() == EditorMode.SAVE_QUERY) {
+                            if (this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) {
                                 this.atto.getEditorScreen().save(this.getFileFromBuffer());
-                            } else if (this.atto.getMode() == EditorMode.OPEN_QUERY) {
+                            } else if (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY) {
                                 this.atto.getEditorScreen().load(this.getFileFromBuffer());
                             }
                         } catch (IOException | InterruptedException e) {
@@ -194,7 +190,7 @@ public class InterfaceScreen implements Screen, KeyListener {
                     }
 
                     case ESCAPE: {
-                        this.atto.setMode(EditorMode.EDITING_TEXT);
+                        this.atto.setScreenAction(ScreenAction.EDITING_TEXT);
                         this.atto.draw();
 
                         return;

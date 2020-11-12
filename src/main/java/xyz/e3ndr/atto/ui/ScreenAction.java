@@ -1,6 +1,6 @@
 package xyz.e3ndr.atto.ui;
 
-public enum EditorMode {
+public enum ScreenAction {
     WAITING,
     EDITING_TEXT,
     SAVE_QUERY,

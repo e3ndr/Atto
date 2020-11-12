@@ -1,9 +1,11 @@
-package xyz.e3ndr.atto.config.menu;
+package xyz.e3ndr.atto.config.menu.interactions;
+
+import xyz.e3ndr.atto.config.menu.Interaction;
 
 public class BooleanInteractable extends Interactable<Boolean> implements InteractableList {
 
-    public BooleanInteractable(Object holder, String prefix, String var) {
-        super(holder, prefix, var);
+    public BooleanInteractable(Interaction annotation, Object holder, String prefix, String var) {
+        super(annotation, holder, prefix, var);
     }
 
     @Override

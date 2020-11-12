@@ -16,12 +16,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
-import xyz.e3ndr.atto.config.menu.BooleanInteractable;
-import xyz.e3ndr.atto.config.menu.EnumInteractable;
-import xyz.e3ndr.atto.config.menu.IntegerInteractable;
-import xyz.e3ndr.atto.config.menu.Interactable;
 import xyz.e3ndr.atto.config.menu.Interaction;
 import xyz.e3ndr.atto.config.menu.SubInteraction;
+import xyz.e3ndr.atto.config.menu.interactions.BooleanInteractable;
+import xyz.e3ndr.atto.config.menu.interactions.EnumInteractable;
+import xyz.e3ndr.atto.config.menu.interactions.IntegerInteractable;
+import xyz.e3ndr.atto.config.menu.interactions.Interactable;
 import xyz.e3ndr.atto.ui.LineEndings;
 import xyz.e3ndr.consoleutil.ansi.ConsoleAttribute;
 import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
@@ -42,14 +42,14 @@ public class AttoConfig {
     }
 
     // System
-    private String language = "en";
+    private @ConfigKey @Interaction Language language = Language.EN;
 
-    private @Interaction LineEndings defaultLineEndings = LineEndings.fromString("system");
+    private @ConfigKey @Interaction LineEndings defaultLineEndings = LineEndings.fromString("system");
 
     // Sizes
-    private @Interaction boolean forceSize = false;
-    private @Interaction int width = 120;
-    private @Interaction int height = 30;
+    private @ConfigKey @Interaction boolean forceSize = false;
+    private @ConfigKey @Interaction int width = 120;
+    private @ConfigKey @Interaction int height = 30;
 
     // Theming
     private @SubInteraction("Text Editor") TextEditorTheme textEditorTheme = new TextEditorTheme();
@@ -71,6 +71,38 @@ public class AttoConfig {
         private @Interaction ConsoleColor backgroundColor = ConsoleColor.BLACK;
         private @Interaction ConsoleColor textColor = ConsoleColor.GRAY;
 
+    }
+
+    public void postInit() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
+        AttoConfig defaults = new AttoConfig();
+
+        // Iterate fields and set the default values.
+        for (Field field : this.getClass().getDeclaredFields()) {
+            if (field.isAnnotationPresent(ConfigKey.class)) {
+                Object value = ReflectionLib.getValue(this, field.getName());
+
+                if (value == null) {
+                    Object defaultValue = ReflectionLib.getValue(defaults, field.getName());
+
+                    ReflectionLib.setValue(this, field.getName(), defaultValue);
+                }
+            } else if (field.isAnnotationPresent(SubInteraction.class)) {
+                Object holder = ReflectionLib.getValue(this, field.getName());
+                Object defaultHolder = ReflectionLib.getValue(defaults, field.getName());
+
+                for (Field subField : holder.getClass().getDeclaredFields()) {
+                    if (subField.isAnnotationPresent(ConfigKey.class)) {
+                        Object value = ReflectionLib.getValue(holder, subField.getName());
+
+                        if (value == null) {
+                            Object defaultValue = ReflectionLib.getValue(defaultHolder, subField.getName());
+
+                            ReflectionLib.setValue(holder, subField.getName(), defaultValue);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @SneakyThrows
@@ -112,9 +144,9 @@ public class AttoConfig {
             interactableClazz = interactions.get(fieldType);
         }
 
-        Constructor<? extends Interactable<?>> constructor = interactableClazz.getConstructor(Object.class, String.class, String.class);
+        Constructor<? extends Interactable<?>> constructor = interactableClazz.getConstructor(Interaction.class, Object.class, String.class, String.class);
 
-        return constructor.newInstance(holder, prefix, field.getName());
+        return constructor.newInstance(field.getAnnotation(Interaction.class), holder, prefix, field.getName());
     }
 
     public static interface Theme {

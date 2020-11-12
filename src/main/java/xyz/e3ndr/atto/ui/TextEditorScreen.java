@@ -17,7 +17,7 @@ import xyz.e3ndr.atto.config.AttoConfig.TextEditorTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
 import xyz.e3ndr.atto.util.EnumUtil;
-import xyz.e3ndr.atto.util.Location;
+import xyz.e3ndr.atto.util.Vector2;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
@@ -25,8 +25,8 @@ import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
 
 public class TextEditorScreen implements Screen, KeyListener {
-    private Location cursor = new Location(0, 0);
-    private Location scroll = new Location(0, 0);
+    private Vector2 cursor = new Vector2(0, 0);
+    private Vector2 scroll = new Vector2(0, 0);
 
     private @NonNull @Getter @Setter LineEndings lineEndings;
     private @Nullable @Getter File file;
@@ -45,8 +45,8 @@ public class TextEditorScreen implements Screen, KeyListener {
     }
 
     public void save(@NonNull File file) throws IOException, InterruptedException {
-        if (this.atto.getMode() == EditorMode.SAVE_QUERY) {
-            this.atto.setMode(EditorMode.WAITING);
+        if (this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) {
+            this.atto.setScreenAction(ScreenAction.WAITING);
             this.edited = false;
             this.file = file;
 
@@ -55,7 +55,7 @@ public class TextEditorScreen implements Screen, KeyListener {
             Files.write(this.file.toPath(), contents.getBytes());
 
             this.atto.setStatus(String.format(LangProvider.get("status.savedfile"), this.file.getCanonicalPath()));
-            this.atto.setMode(EditorMode.EDITING_TEXT);
+            this.atto.setScreenAction(ScreenAction.EDITING_TEXT);
             this.atto.draw();
 
             ThreadHelper.executeLater(() -> {
@@ -95,16 +95,16 @@ public class TextEditorScreen implements Screen, KeyListener {
 
             this.atto.setStatus(this.file.getCanonicalPath());
         } else {
-            this.atto.setStatus(LangProvider.get("status.newfile"));
+            this.atto.setStatus("status.newfile");
         }
 
-        this.atto.setMode(EditorMode.EDITING_TEXT);
+        this.atto.setScreenAction(ScreenAction.EDITING_TEXT);
         this.atto.draw();
     }
 
     @Override
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
-        if (this.atto.getMode() != EditorMode.OPTIONS) {
+        if (this.atto.getScreenAction() != ScreenAction.OPTIONS) {
             TextEditorTheme theme = this.atto.getConfig().getTextEditorTheme();
 
             window.setBackgroundColor(theme.getBackgroundColor()).setTextColor(theme.getTextColor());
@@ -119,7 +119,7 @@ public class TextEditorScreen implements Screen, KeyListener {
                 num++;
             }
 
-            if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+            if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
                 window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);
                 window.saveCursorPosition();
             }
@@ -129,7 +129,7 @@ public class TextEditorScreen implements Screen, KeyListener {
     @SneakyThrows
     @Override
     public void onKey(char key, boolean alt, boolean control) {
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
             if (control) {
                 switch (key) {
 
@@ -201,7 +201,7 @@ public class TextEditorScreen implements Screen, KeyListener {
     @SneakyThrows
     @Override
     public void onKey(InputKey key) {
-        if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
             switch (key) {
 
                 case END: {
@@ -213,7 +213,7 @@ public class TextEditorScreen implements Screen, KeyListener {
                 }
 
                 case PAGE_UP: {
-                    if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+                    if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
                         if (this.scroll.y > 0) {
                             this.scroll.y--;
                             this.cursor.y--;
@@ -227,7 +227,7 @@ public class TextEditorScreen implements Screen, KeyListener {
                 }
 
                 case PAGE_DOWN: {
-                    if (this.atto.getMode() == EditorMode.EDITING_TEXT) {
+                    if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
                         this.scroll.y++;
                         this.cursor.y++;
                         this.atto.draw();

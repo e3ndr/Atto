@@ -1,4 +1,4 @@
-package xyz.e3ndr.atto.config.menu;
+package xyz.e3ndr.atto.config.menu.interactions;
 
 public interface InteractableList {
 
