@@ -22,6 +22,7 @@ import xyz.e3ndr.atto.config.menu.interactions.BooleanInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.EnumInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.IntegerInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.Interactable;
+import xyz.e3ndr.atto.lang.Language;
 import xyz.e3ndr.atto.ui.LineEndings;
 import xyz.e3ndr.consoleutil.ansi.ConsoleAttribute;
 import xyz.e3ndr.consoleutil.ansi.ConsoleColor;

@@ -1,4 +1,4 @@
-package xyz.e3ndr.atto.config;
+package xyz.e3ndr.atto.lang;
 
 import lombok.AllArgsConstructor;
 
