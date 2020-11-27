@@ -1,34 +1,33 @@
 {
     "aliases": [
-        "json",
-        "js",
-        "ts"
+        "yml",
+        "yaml"
     ],
     "override": "GRAY",
     "rules": [
         {
-            "match": "(\\/\\/)[\\S].*",
-            "color": "GREEN",
+            "match": "[\\-]",
+            "color": "WHITE",
             "priority": 1
         },
         {
-            "match": "(?=(\\/\\*))[\\s\\S]*(?<=(\\*\\/))",
+            "match": "[#][\\S].*",
             "color": "GREEN",
             "priority": 2
         },
         {
-            "match": "([\\\"'`])(?:(?=(\\\\?))\\2.)*?\\1",
+            "match": "([\"'])(?:(?=(\\\\?))\\2.)*?\\1",
             "color": "LIGHT_RED",
             "priority": 3
         },
         {
-            "match": "(class|function|const|let|var)",
+            "match": "[^\\s]+:",
             "color": "CYAN",
             "priority": 4
         },
         {
-            "match": "[0-9]+(\\.[0-9]+)?",
-            "color": "LIGHT_YELLOW",
+            "match": "[\\[\\]{},]",
+            "color": "WHITE",
             "priority": 5
         },
         {

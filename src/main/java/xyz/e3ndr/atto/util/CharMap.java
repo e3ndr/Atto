@@ -68,37 +68,22 @@ public class CharMap {
         return (y >= this.map.length) ? 0 : this.map[y].length;
     }
 
-    public String[] string(int top, int height, int screenWidth, boolean fileOut) {
-        String[] lines = new String[height];
+    public String string(String lineEndings) {
+        StringBuilder line = new StringBuilder();
 
-        int num = 0;
-        for (int y = top; y != height + top; y++) {
-            StringBuilder line = new StringBuilder();
+        for (char[] arr : this.map) {
+            line.append(lineEndings);
 
-            if (y < this.map.length) {
-                char[] lineArr = this.map[y];
-
-                for (int x = 0; x != lineArr.length; x++) {
-                    if ((lineArr == null) || (x >= lineArr.length)) {
-                        if (!fileOut) {
-                            line.append(' ');
-                        } else {
-                            break;
-                        }
-                    } else {
-                        line.append(lineArr[x]);
-                    }
-                }
-            } else if (!fileOut) {
-                line.append(MiscUtil.explode(screenWidth));
+            if (arr != null) {
+                line.append(arr);
             }
-
-            lines[num] = fileOut ? line.toString().replaceFirst("\\s++$", "") : line.toString();
-
-            num++;
         }
 
-        return lines;
+        if (line.length() == 0) {
+            return "";
+        } else {
+            return line.substring(lineEndings.length());
+        }
     }
 
     public static char[] addPos(char[] arr, int index, char c) {

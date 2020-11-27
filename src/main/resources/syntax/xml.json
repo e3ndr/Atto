@@ -1,0 +1,19 @@
+{
+    "aliases": [
+        "xml",
+        "html"
+    ],
+    "override": "GRAY",
+    "rules": [
+        {
+            "match": "<!--[\\s\\S\\n]*?-->",
+            "color": "GREEN",
+            "priority": 0
+        },
+        {
+            "match": "<(.*?)>",
+            "color": "CYAN",
+            "priority": 1
+        }
+    ]
+}

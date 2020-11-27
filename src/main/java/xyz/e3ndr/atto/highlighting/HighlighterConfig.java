@@ -1,13 +1,15 @@
-package xyz.e3ndr.atto.config.highlight‌ing;
+package xyz.e3ndr.atto.highlighting;
 
 import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
+import xyz.e3ndr.consoleutil.ansi.ConsoleColor;
 
 @Getter
 public class HighlighterConfig {
     private List<HighlighterRule> rules;
+    private ConsoleColor override;
     private List<String> aliases;
 
     public void sort() {

@@ -106,6 +106,7 @@ public class Atto {
                 ConsoleUtil.setTitle("Atto " + LangProvider.get(this.status));
             }
 
+            this.window.clearScreen();
             this.interfaceScreen.draw(this.window, this.size);
             this.optionsScreen.draw(this.window, this.size);
             this.editorScreen.draw(this.window, this.size);

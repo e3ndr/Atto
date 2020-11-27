@@ -22,6 +22,7 @@ import xyz.e3ndr.atto.config.menu.interactions.BooleanInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.EnumInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.IntegerInteractable;
 import xyz.e3ndr.atto.config.menu.interactions.Interactable;
+import xyz.e3ndr.atto.highlighting.Highlighter;
 import xyz.e3ndr.atto.lang.Language;
 import xyz.e3ndr.atto.ui.LineEndings;
 import xyz.e3ndr.consoleutil.ansi.ConsoleAttribute;
@@ -55,6 +56,8 @@ public class AttoConfig {
     // Theming
     private @SubInteraction("Text Editor") TextEditorTheme textEditorTheme = new TextEditorTheme();
     private @SubInteraction("Interface") InterfaceTheme interfaceTheme = new InterfaceTheme();
+
+    private String[] syntaxHighlighting = {};
 
     @Getter
     @Setter
@@ -104,6 +107,16 @@ public class AttoConfig {
                 }
             }
         }
+
+        if (this.syntaxHighlighting != null) {
+            for (String file : this.syntaxHighlighting) {
+                try {
+                    Highlighter.addConfig(new File(file));
+                } catch (IOException ignored) {}
+            }
+        }
+
+        Highlighter.postInit();
     }
 
     @SneakyThrows
