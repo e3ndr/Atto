@@ -68,7 +68,7 @@ public class CharMap {
         return (y >= this.map.length) ? 0 : this.map[y].length;
     }
 
-    public String[] string(int left, int top, int height, int width, boolean fileOut) {
+    public String[] string(int top, int height, int screenWidth, boolean fileOut) {
         String[] lines = new String[height];
 
         int num = 0;
@@ -78,7 +78,7 @@ public class CharMap {
             if (y < this.map.length) {
                 char[] lineArr = this.map[y];
 
-                for (int x = left; x != width + left; x++) {
+                for (int x = 0; x != lineArr.length; x++) {
                     if ((lineArr == null) || (x >= lineArr.length)) {
                         if (!fileOut) {
                             line.append(' ');
@@ -90,9 +90,7 @@ public class CharMap {
                     }
                 }
             } else if (!fileOut) {
-                for (int x = 0; x != width + left; x++) {
-                    line.append(' ');
-                }
+                line.append(MiscUtil.explode(screenWidth));
             }
 
             lines[num] = fileOut ? line.toString().replaceFirst("\\s++$", "") : line.toString();

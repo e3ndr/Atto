@@ -1,0 +1,28 @@
+{
+    "aliases": [
+        "json",
+        "js"
+    ],
+    "rules": [
+        {
+            "match": "([\"'`])(?:(?=(\\\\?))\\2.)*?\\1",
+            "color": "LIGHT_RED",
+            "priority": 0
+        },
+        {
+            "match": "(class|function|const|let|var)",
+            "color": "CYAN",
+            "priority": 1
+        },
+        {
+            "match": "[0-9]+(\\.[0-9]+)?",
+            "color": "LIGHT_YELLOW",
+            "priority": 2
+        },
+        {
+            "match": "(true|false)",
+            "color": "LIGHT_GREEN",
+            "priority": 3
+        }
+    ]
+}
