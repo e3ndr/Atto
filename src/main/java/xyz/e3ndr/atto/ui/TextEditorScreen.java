@@ -14,9 +14,11 @@ import lombok.SneakyThrows;
 import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.ThreadHelper;
 import xyz.e3ndr.atto.config.AttoConfig.TextEditorTheme;
+import xyz.e3ndr.atto.highlighting.Highlighter;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.CharMap;
 import xyz.e3ndr.atto.util.EnumUtil;
+import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.atto.util.Vector2;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
 import xyz.e3ndr.consoleutil.ConsoleWindow;
@@ -50,7 +52,7 @@ public class TextEditorScreen implements Screen, KeyListener {
             this.edited = false;
             this.file = file;
 
-            String contents = String.join(this.lineEndings.getSeparator(), this.map.string(0, 0, this.map.height(), -1, true));
+            String contents = this.map.string(this.lineEndings.getSeparator());
 
             Files.write(this.file.toPath(), contents.getBytes());
 
@@ -80,7 +82,7 @@ public class TextEditorScreen implements Screen, KeyListener {
 
             if (this.file.isFile()) {
                 String contents = new String(Files.readAllBytes(this.file.toPath())).replace("\t", "    ");
-                String[] lines = contents.replace("\r", "\n").split("\n");
+                String[] lines = contents.replace("\r\n", "\n").replace("\r", "\n").split("\n");
 
                 this.lineEndings = LineEndings.detect(contents);
 
@@ -111,13 +113,10 @@ public class TextEditorScreen implements Screen, KeyListener {
             window.setAttributes(theme.getTextAttributes()).cursorTo(0, Atto.TOP_INDENT); // Reset.
 
             // Write contents.
-            String[] lines = this.map.string(this.scroll.x, this.scroll.y, (size.height - Atto.TOP_INDENT) - Atto.BOTTOM_INDENT, size.width, false);
-            int num = 0;
+            String contents = this.map.string("\n");
+            String highlighted = Highlighter.formatLine(contents, this.file, theme.getTextColor());
 
-            for (String line : lines) {
-                window.cursorTo(0, Atto.TOP_INDENT + num).write(line);
-                num++;
-            }
+            window.cursorTo(0, Atto.TOP_INDENT).write(MiscUtil.subStringWithColor(highlighted, this.scroll.x, this.scroll.y, size.width - 2, size.height)); // Sub 2 because of the top indent and bottom indent
 
             if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
                 window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);

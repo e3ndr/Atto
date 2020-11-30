@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lombok.NonNull;
-import xyz.e3ndr.atto.config.Language;
 
 public class LangProvider {
     private static Map<String, String> lang = new HashMap<>();

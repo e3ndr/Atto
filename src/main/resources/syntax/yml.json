@@ -1,0 +1,39 @@
+{
+    "aliases": [
+        "yml",
+        "yaml"
+    ],
+    "override": "GRAY",
+    "rules": [
+        {
+            "match": "[\\-]",
+            "color": "WHITE",
+            "priority": 1
+        },
+        {
+            "match": "[#][\\S].*",
+            "color": "GREEN",
+            "priority": 2
+        },
+        {
+            "match": "([\"'])(?:(?=(\\\\?))\\2.)*?\\1",
+            "color": "LIGHT_RED",
+            "priority": 3
+        },
+        {
+            "match": "[^\\s]+:",
+            "color": "CYAN",
+            "priority": 4
+        },
+        {
+            "match": "[\\[\\]{},]",
+            "color": "WHITE",
+            "priority": 5
+        },
+        {
+            "match": "(true|false)",
+            "color": "LIGHT_GREEN",
+            "priority": 6
+        }
+    ]
+}
