@@ -115,8 +115,9 @@ public class TextEditorScreen implements Screen, KeyListener {
             // Write contents.
             String contents = this.map.string("\n");
             String highlighted = Highlighter.formatLine(contents, this.file, theme.getTextColor());
+            String sub = MiscUtil.subStringWithColor(highlighted, this.scroll.x, this.scroll.y, size.width, size.height - 2); // Sub 2 because of the top indent and bottom indent
 
-            window.cursorTo(0, Atto.TOP_INDENT).write(MiscUtil.subStringWithColor(highlighted, this.scroll.x, this.scroll.y, size.width - 2, size.height)); // Sub 2 because of the top indent and bottom indent
+            window.cursorTo(0, Atto.TOP_INDENT).write(sub);
 
             if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
                 window.cursorTo((this.cursor.x - this.scroll.x), (this.cursor.y - this.scroll.y) + Atto.TOP_INDENT);

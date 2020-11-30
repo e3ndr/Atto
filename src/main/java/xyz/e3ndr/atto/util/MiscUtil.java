@@ -45,7 +45,7 @@ public class MiscUtil {
                 if (currentLine == height - 2) {
                     break;
                 } else if (currentLine >= y) {
-                    if ((lineIndex != width) && (lineIndex >= x)) {
+                    if ((lineIndex < width) && (lineIndex >= x)) {
                         sb.append(arr[i]);
                     }
 
