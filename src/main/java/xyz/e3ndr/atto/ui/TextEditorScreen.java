@@ -26,7 +26,7 @@ import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
 
-public class TextEditorScreen implements Screen, KeyListener {
+public class TextEditorScreen implements EditorScreen, KeyListener {
     private Vector2 cursor = new Vector2(0, 0);
     private Vector2 scroll = new Vector2(0, 0);
 

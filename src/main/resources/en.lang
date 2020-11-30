@@ -9,6 +9,7 @@ status.savedfile=Saved File "%s"
 status.readingfile=Reading File "%s"
 status.newfile=(New File)
 
-hint.bottom=^W Exit    ^S Save File    ^O Open File    ^L Clear Line    ^P Preferences
+hint.bottom.texteditor=^W Exit   ^S Save File   ^O Open File   ^E Open File (Hex)   ^L Clear Line   ^P Preferences
+hint.bottom.hexeditor=^W Exit   ^S Save File   ^O Open File   ^E Open File (Hex)   ^P Preferences
 
 misc.listseperator=, 

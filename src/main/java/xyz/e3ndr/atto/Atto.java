@@ -15,6 +15,8 @@ import lombok.NonNull;
 import lombok.Setter;
 import xyz.e3ndr.atto.config.AttoConfig;
 import xyz.e3ndr.atto.lang.LangProvider;
+import xyz.e3ndr.atto.ui.EditorScreen;
+import xyz.e3ndr.atto.ui.HexEditorScreen;
 import xyz.e3ndr.atto.ui.InterfaceScreen;
 import xyz.e3ndr.atto.ui.OptionsScreen;
 import xyz.e3ndr.atto.ui.ScreenAction;
@@ -36,10 +38,13 @@ public class Atto {
 
     private @NonNull @Setter(AccessLevel.NONE) Dimension size = new Dimension();
     private @NonNull @Setter(AccessLevel.NONE) InterfaceScreen interfaceScreen;
-    private @NonNull @Setter(AccessLevel.NONE) TextEditorScreen editorScreen;
     private @NonNull @Setter(AccessLevel.NONE) OptionsScreen optionsScreen;
+    private @NonNull @Setter(AccessLevel.NONE) EditorScreen editorScreen;
     private @NonNull @Setter(AccessLevel.NONE) ConsoleWindow window;
     private @NonNull @Setter(AccessLevel.NONE) AttoConfig config;
+
+    private @NonNull @Setter(AccessLevel.NONE) TextEditorScreen textEditorScreen;
+    private @NonNull @Setter(AccessLevel.NONE) HexEditorScreen hexEditorScreen;
 
     private @Setter(AccessLevel.NONE) boolean debug;
 
@@ -53,11 +58,12 @@ public class Atto {
 
         LangProvider.setLanguage(this.config.getLanguage());
 
-        this.editorScreen = new TextEditorScreen(this, this.config.getDefaultLineEndings());
+        this.textEditorScreen = new TextEditorScreen(this, this.config.getDefaultLineEndings());
+        this.hexEditorScreen = new HexEditorScreen(this, this.config.getDefaultLineEndings());
         this.interfaceScreen = new InterfaceScreen(this);
         this.optionsScreen = new OptionsScreen(this);
 
-        this.editorScreen.load(file);
+        this.textEditorScreen.load(file);
 
         this.draw();
 
@@ -99,6 +105,12 @@ public class Atto {
     public synchronized void draw() {
         try {
             this.size = ConsoleUtil.getSize();
+
+            if (this.screenAction == ScreenAction.EDITING_TEXT) {
+                this.editorScreen = this.textEditorScreen;
+            } else if (this.screenAction == ScreenAction.EDITING_HEX) {
+                this.editorScreen = this.hexEditorScreen;
+            }
 
             if (this.editorScreen.isEdited()) {
                 ConsoleUtil.setTitle("Atto *" + LangProvider.get(this.status));

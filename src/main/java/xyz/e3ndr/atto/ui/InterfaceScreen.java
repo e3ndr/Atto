@@ -35,7 +35,6 @@ public class InterfaceScreen implements Screen, KeyListener {
     @Override
     public void draw(@NonNull ConsoleWindow window, @NonNull Dimension size) throws Exception {
         // Write title bar
-        String lineEndings = this.atto.getEditorScreen().getLineEndings().toString();
         InterfaceTheme theme = this.atto.getConfig().getInterfaceTheme();
         String middleText = String.format("Atto %s", Atto.VERSION);
 
@@ -50,7 +49,11 @@ public class InterfaceScreen implements Screen, KeyListener {
 
         window.write(makeTopBarText());
         window.writeAt(MiscUtil.getPaddingToCenter(middleText.length(), size.width), 0, middleText);
-        window.writeAt(size.width - lineEndings.length() - 1, 0, lineEndings);
+
+        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
+            String lineEndings = this.atto.getTextEditorScreen().getLineEndings().toString();
+            window.writeAt(size.width - lineEndings.length() - 1, 0, lineEndings);
+        }
 
         // Write bottom bar
         window.cursorTo(0, size.height - Atto.BOTTOM_INDENT);
@@ -59,12 +62,7 @@ public class InterfaceScreen implements Screen, KeyListener {
         window.setAttributes(theme.getTextAttributes());
         window.clearLine();
 
-        if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
-            String bottom = LangProvider.get("hint.bottom");
-            int padding = MiscUtil.getPaddingToCenter(bottom.length(), size.width);
-
-            window.cursorTo(padding, size.height - Atto.BOTTOM_INDENT).write(bottom);
-        } else if ((this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) || (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY)) {
+        if ((this.atto.getScreenAction() == ScreenAction.SAVE_QUERY) || (this.atto.getScreenAction() == ScreenAction.OPEN_QUERY)) {
             String[] splitQuery = this.query.split("%s", 2);
 
             window.write(splitQuery[0]);
@@ -79,6 +77,20 @@ public class InterfaceScreen implements Screen, KeyListener {
             // Move cursor
             window.cursorTo(splitQuery[0].length() + this.buffer.length(), size.height - Atto.BOTTOM_INDENT);
             window.saveCursorPosition();
+        } else {
+            String bottom;
+
+            if (this.atto.getScreenAction() == ScreenAction.EDITING_TEXT) {
+                bottom = LangProvider.get("hint.bottom.texteditor");
+            } else if (this.atto.getScreenAction() == ScreenAction.EDITING_HEX) {
+                bottom = LangProvider.get("hint.bottom.hexeditor");
+            } else {
+                return;
+            }
+
+            int padding = MiscUtil.getPaddingToCenter(bottom.length(), size.width);
+
+            window.cursorTo(padding, size.height - Atto.BOTTOM_INDENT).write(bottom);
         }
     }
 
@@ -128,15 +140,20 @@ public class InterfaceScreen implements Screen, KeyListener {
         try {
             if (control) {
                 switch (key) {
+                    case 'e': {
+
+                        return;
+                    }
+
                     case 'o': { // ^O
-                        this.atto.getInterfaceScreen().triggerOpenDialog();
+                        this.triggerOpenDialog();
                         this.atto.draw();
 
                         return;
                     }
 
                     case 's': { // ^S
-                        this.atto.getInterfaceScreen().triggerSaveDialog();
+                        this.triggerSaveDialog();
                         this.atto.draw();
 
                         return;

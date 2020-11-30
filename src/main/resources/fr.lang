@@ -9,6 +9,7 @@ status.savedfile=Fichier enregistré dans «%s»
 status.readingfile=Lecture de fichier «%s»
 status.newfile=(Nouveau Fichier)
 
-hint.bottom=^W Sortie    ^S Enregistrer le fichier    ^O Fichier ouvert    ^L Effacer la ligne de texte    ^P Préférences
+hint.bottom.texteditor=^W Sortie   ^S Enregistrer le fichier   ^O Fichier ouvert   ^E Fichier ouvert (Hex)   ^L Effacer la ligne de texte   ^P Préférences
+hint.bottom.hexeditor=^W Sortie   ^S Enregistrer le fichier   ^O Fichier ouvert   ^E Fichier ouvert (Hex)   ^P Préférences
 
 misc.listseperator=, 
