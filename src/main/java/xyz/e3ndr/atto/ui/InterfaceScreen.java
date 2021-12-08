@@ -11,7 +11,7 @@ import xyz.e3ndr.atto.Atto;
 import xyz.e3ndr.atto.config.AttoConfig.InterfaceTheme;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.MiscUtil;
-import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.consolewindow.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -29,7 +29,7 @@ public class InterfaceScreen implements Screen, KeyListener {
     public InterfaceScreen(@NonNull Atto atto) {
         this.atto = atto;
 
-        KeyHook.addListener(this);
+        KeyHook.CURRENT.addListener(this);
     }
 
     @Override

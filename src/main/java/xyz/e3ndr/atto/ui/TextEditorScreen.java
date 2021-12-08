@@ -21,7 +21,7 @@ import xyz.e3ndr.atto.util.EnumUtil;
 import xyz.e3ndr.atto.util.MiscUtil;
 import xyz.e3ndr.atto.util.Vector2;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
-import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.consolewindow.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -43,7 +43,7 @@ public class TextEditorScreen implements Screen, KeyListener {
         this.atto = atto;
         this.lineEndings = lineEndings;
 
-        KeyHook.addListener(this);
+        KeyHook.CURRENT.addListener(this);
     }
 
     public void save(@NonNull File file) throws IOException, InterruptedException {

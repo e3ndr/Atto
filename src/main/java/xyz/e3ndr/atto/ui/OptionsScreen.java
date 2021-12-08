@@ -11,7 +11,7 @@ import xyz.e3ndr.atto.config.menu.interactions.Interactable;
 import xyz.e3ndr.atto.config.menu.interactions.InteractableList;
 import xyz.e3ndr.atto.lang.LangProvider;
 import xyz.e3ndr.atto.util.MiscUtil;
-import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.consolewindow.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
@@ -25,7 +25,7 @@ public class OptionsScreen implements Screen, KeyListener {
     public OptionsScreen(@NonNull Atto atto) {
         this.atto = atto;
 
-        KeyHook.addListener(this);
+        KeyHook.CURRENT.addListener(this);
 
         this.options = this.atto.getConfig().getInteractions();
     }

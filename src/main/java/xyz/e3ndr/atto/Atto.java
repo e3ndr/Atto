@@ -20,7 +20,7 @@ import xyz.e3ndr.atto.ui.OptionsScreen;
 import xyz.e3ndr.atto.ui.ScreenAction;
 import xyz.e3ndr.atto.ui.TextEditorScreen;
 import xyz.e3ndr.consoleutil.ConsoleUtil;
-import xyz.e3ndr.consoleutil.ConsoleWindow;
+import xyz.e3ndr.consoleutil.consolewindow.ConsoleWindow;
 
 @Getter
 @Setter
@@ -44,7 +44,7 @@ public class Atto {
     private @Setter(AccessLevel.NONE) boolean debug;
 
     public Atto(@Nullable File file, boolean debug, AttoConfig config) throws Exception {
-        this.window = new ConsoleWindow().setAutoFlushing(false);
+        this.window = ConsoleUtil.getAttachedConsoleWindow().setAutoFlushing(false);
         this.config = config;
 
         if ((this.config.getWidth() > 0) && (this.config.getHeight() > 0)) {
