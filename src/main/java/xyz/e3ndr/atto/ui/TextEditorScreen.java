@@ -25,6 +25,7 @@ import xyz.e3ndr.consoleutil.consolewindow.ConsoleWindow;
 import xyz.e3ndr.consoleutil.input.InputKey;
 import xyz.e3ndr.consoleutil.input.KeyHook;
 import xyz.e3ndr.consoleutil.input.KeyListener;
+import xyz.e3ndr.consoleutil.platform.JavaPlatform;
 
 public class TextEditorScreen implements Screen, KeyListener {
     private Vector2 cursor = new Vector2(0, 0);
@@ -282,6 +283,19 @@ public class TextEditorScreen implements Screen, KeyListener {
                     return;
                 }
 
+                case DELETE: {
+                	// On Macs DELETE and BACKSPACE are the same,
+                	// so on Macs we ignore the input and let it 
+                	// fall through to the BACK_SPACE handler.
+                	if (ConsoleUtil.getPlatform() != JavaPlatform.MAC) {
+	                    this.map.set(this.cursor.x, this.cursor.y, ' ');
+	                    this.edited = true;
+	                    this.move(-1, 0);
+	
+	                    return;
+                	}
+                }
+
                 case BACK_SPACE: {
                     if (this.cursor.x > 0) {
                         if (this.overwriting) {
@@ -311,14 +325,6 @@ public class TextEditorScreen implements Screen, KeyListener {
                     this.onKey(' ', false, false);
                     this.onKey(' ', false, false);
                     this.onKey(' ', false, false);
-
-                    return;
-                }
-
-                case DELETE: {
-                    this.map.set(this.cursor.x, this.cursor.y, ' ');
-                    this.edited = true;
-                    this.move(-1, 0);
 
                     return;
                 }

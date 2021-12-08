@@ -180,6 +180,7 @@ public class InterfaceScreen implements Screen, KeyListener {
                         return;
                     }
 
+                    case DELETE:
                     case BACK_SPACE: {
                         if (this.buffer.length() > 0) {
                             this.buffer.deleteCharAt(this.buffer.length() - 1);
@@ -265,7 +266,6 @@ public class InterfaceScreen implements Screen, KeyListener {
                     case LEFT:
                     case RIGHT:
                     case INSERT:
-                    case DELETE:
                     case HOME:
                     case END:
                     default:
